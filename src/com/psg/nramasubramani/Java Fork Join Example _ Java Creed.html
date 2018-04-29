@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<!-- saved from url=(0048)http://www.javacreed.com/java-fork-join-example/ -->
+<html lang="en-US" class="csstransforms csstransforms3d csstransitions"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Java Fork Join Example | Java Creed</title>
+<meta name="description" content="Java 7 introduced a new type of ExecutorService (Java Doc) called Fork/Join Framework (Tutorial), which excels in handling recursive algorithms. Different from other implementations of the ExecutorService, the Fork/Join Framework uses a work-stealing algorithm (Paper), which maximise the threads utilisation, and provides a simpler way to deal with tasks which spawn other tasks (referred to as subtasks).">
+<meta name="keywords" content="Articles, Java, Fork, Join, Example">
+<link rel="shortcut icon" href="http://www.javacreed.com/wp-content/uploads/2014/12/favicon.ico">
+
+<!--[if lt IE 9]>
+            <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+ 
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+ 
+<link rel="stylesheet" href="./Java Fork Join Example _ Java Creed_files/bootstrap.css" type="text/css">
+<link rel="stylesheet" href="./Java Fork Join Example _ Java Creed_files/style.css" type="text/css">
+<link rel="stylesheet" href="./Java Fork Join Example _ Java Creed_files/bootstrap-responsive.css" type="text/css">
+<link rel="stylesheet" href="./Java Fork Join Example _ Java Creed_files/responsive.css" type="text/css">
+<link rel="stylesheet" href="./Java Fork Join Example _ Java Creed_files/prettyPhoto.css" type="text/css">
+<link rel="stylesheet" href="./Java Fork Join Example _ Java Creed_files/options.css" type="text/css">
+<link href="./Java Fork Join Example _ Java Creed_files/css" rel="stylesheet" type="text/css">
+<div class="fit-vids-style" id="fit-vids-style" style="display: none;">­<style>.fluid-width-video-wrapper{width: 100%;position: relative;padding: 0;}.fluid-width-video-wrapper iframe,.fluid-width-video-wrapper object,.fluid-width-video-wrapper embed {position: absolute;top: 0;left: 0;width: 100%;height: 100%;}</style></div><script src="./Java Fork Join Example _ Java Creed_files/cb=gapi.loaded_1" async=""></script><script src="./Java Fork Join Example _ Java Creed_files/cb=gapi.loaded_0" async=""></script><script type="text/javascript" async="" src="./Java Fork Join Example _ Java Creed_files/ga.js"></script><script src="./Java Fork Join Example _ Java Creed_files/ca-pub-5674469676151789.js"></script><script type="text/javascript" async="" src="./Java Fork Join Example _ Java Creed_files/ga.js"></script><script type="text/javascript">
+            var tt_home_uri     = 'http://www.javacreed.com';
+            var tt_theme_uri    = 'http://www.javacreed.com/wp-content/themes/PressGrid-3.3.1';
+            var tt_infinite_img = 'http://www.javacreed.com/wp-content/themes/PressGrid-3.3.1/images/ajax-loader.gif';
+            var $infinitescroll =  1;
+            var tt_infinite_loadingMsg  = 'Loading the next set of posts...';
+            var tt_infinite_finishedMsg = 'No more pages to load.';
+			var social_media = '1';
+            var sharethis_key = '';
+            var is_header_fixed = '';
+			var stop_nice_scroll = '1';
+        </script>
+ 
+ 
+<meta property="og:title" content="Java Fork Join Example | Java Creed"><meta property="og:url" content="http://www.javacreed.com/java-fork-join-example/">
+<meta property="og:image" content="http://www.javacreed.com/wp-content/uploads/2014/12/Java-Fork-Join-Example.png">
+<meta property="og:site_name" content="Java Creed">
+<meta property="og:description" content="Detailed Articles and Examples about Java Technology">
+ 
+ 
+ 
+ 
+<link rel="author" href="https://plus.google.com/+albertattard">
+<meta name="description" itemprop="description" content="Java 7 introduced a new type of ExecutorService (Java Doc) called Fork/Join Framework (Tutorial), which excels in handling recursive algorithms. Different from">
+<meta name="keywords" itemprop="keywords" content="fork join,forkjoinpool,forkjointask,recursiveaction,recursivetask">
+<link rel="canonical" href="http://www.javacreed.com/java-fork-join-example/">
+<script type="text/javascript">
+		  var _gaq = _gaq || [];
+		  _gaq.push(['_setAccount', 'UA-37192864-1']);
+		  _gaq.push(['_trackPageview']);
+		  (function() {
+		    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		  })();
+		</script>
+ 
+<link rel="alternate" type="application/rss+xml" title="Java Creed » Feed" href="http://www.javacreed.com/feed/">
+<link rel="alternate" type="application/rss+xml" title="Java Creed » Comments Feed" href="http://www.javacreed.com/comments/feed/">
+<link rel="alternate" type="application/rss+xml" title="Java Creed » Java Fork Join Example Comments Feed" href="http://www.javacreed.com/java-fork-join-example/feed/">
+<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/72x72\/","ext":".png","source":{"concatemoji":"http:\/\/www.javacreed.com\/wp-includes\/js\/wp-emoji-release.min.js?ver=6c3f897941b1b281ccabc862a55ff46f"}};
+			!function(a,b,c){function d(a){var c,d,e,f=b.createElement("canvas"),g=f.getContext&&f.getContext("2d"),h=String.fromCharCode;return g&&g.fillText?(g.textBaseline="top",g.font="600 32px Arial","flag"===a?(g.fillText(h(55356,56806,55356,56826),0,0),f.toDataURL().length>3e3):"diversity"===a?(g.fillText(h(55356,57221),0,0),c=g.getImageData(16,16,1,1).data,g.fillText(h(55356,57221,55356,57343),0,0),c=g.getImageData(16,16,1,1).data,e=c[0]+","+c[1]+","+c[2]+","+c[3],d!==e):("simple"===a?g.fillText(h(55357,56835),0,0):g.fillText(h(55356,57135),0,0),0!==g.getImageData(16,16,1,1).data[0])):!1}function e(a){var c=b.createElement("script");c.src=a,c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g;c.supports={simple:d("simple"),flag:d("flag"),unicode8:d("unicode8"),diversity:d("diversity")},c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.simple&&c.supports.flag&&c.supports.unicode8&&c.supports.diversity||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script><script src="./Java Fork Join Example _ Java Creed_files/wp-emoji-release.min.js" type="text/javascript"></script>
+<style type="text/css">img.wp-smiley,img.emoji{display:inline!important;border:none!important;box-shadow:none!important;height:1em!important;width:1em!important;margin:0 .07em!important;vertical-align:-0.1em!important;background:none!important;padding:0!important;}</style>
+<link rel="stylesheet" id="cptch_stylesheet-css" href="./Java Fork Join Example _ Java Creed_files/style(1).css" type="text/css" media="all">
+<link rel="stylesheet" id="dashicons-css" href="./Java Fork Join Example _ Java Creed_files/dashicons.min.css" type="text/css" media="all">
+<link rel="stylesheet" id="cptch_desktop_style-css" href="./Java Fork Join Example _ Java Creed_files/desktop_style.css" type="text/css" media="all">
+<link rel="stylesheet" id="crp-style-rounded-thumbs-css" href="./Java Fork Join Example _ Java Creed_files/default-style.css" type="text/css" media="all">
+<style id="crp-style-rounded-thumbs-inline-css" type="text/css">.crp_related a{width:50px;height:50px;text-decoration:none;}.crp_related img{max-width:50px;margin:auto;}.crp_related .crp_title{width:44px;}</style>
+<link rel="stylesheet" id="sccss_style-css" href="./Java Fork Join Example _ Java Creed_files/saved_resource" type="text/css" media="all">
+<script type="text/javascript" src="./Java Fork Join Example _ Java Creed_files/jquery.js"></script>
+<script type="text/javascript" src="./Java Fork Join Example _ Java Creed_files/jquery-migrate.min.js"></script>
+<script type="text/javascript">
+/* <![CDATA[ */
+var cptch_vars = {"nonce":"b161a331e1","ajaxurl":"http:\/\/www.javacreed.com\/wp-admin\/admin-ajax.php","enlarge":"0"};
+/* ]]> */
+</script>
+<script type="text/javascript" src="./Java Fork Join Example _ Java Creed_files/front_end_script.js"></script>
+<link rel="https://api.w.org/" href="http://www.javacreed.com/wp-json/">
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.javacreed.com/xmlrpc.php?rsd">
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.javacreed.com/wp-includes/wlwmanifest.xml">
+<link rel="prev" title="What is Race Condition and How to Prevent It?" href="http://www.javacreed.com/what-is-race-condition-and-how-to-prevent-it/">
+<link rel="next" title="The Broken Singleton" href="http://www.javacreed.com/the-broken-singleton/">
+<link rel="shortlink" href="http://www.javacreed.com/?p=5257">
+<link rel="alternate" type="application/json+oembed" href="http://www.javacreed.com/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fwww.javacreed.com%2Fjava-fork-join-example%2F">
+<link rel="alternate" type="text/xml+oembed" href="http://www.javacreed.com/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fwww.javacreed.com%2Fjava-fork-join-example%2F&amp;format=xml">
+ 
+<meta name="google-site-verification" content="OyOaQdb21OIQUAQbaqKkkMT6OLSa6qbtWS1kj0NJaRY">
+<script type="text/javascript">
+(function(url){
+	if(/(?:Chrome\/26\.0\.1410\.63 Safari\/537\.31|WordfenceTestMonBot)/.test(navigator.userAgent)){ return; }
+	var addEvent = function(evt, handler) {
+		if (window.addEventListener) {
+			document.addEventListener(evt, handler, false);
+		} else if (window.attachEvent) {
+			document.attachEvent('on' + evt, handler);
+		}
+	};
+	var removeEvent = function(evt, handler) {
+		if (window.removeEventListener) {
+			document.removeEventListener(evt, handler, false);
+		} else if (window.detachEvent) {
+			document.detachEvent('on' + evt, handler);
+		}
+	};
+	var evts = 'contextmenu dblclick drag dragend dragenter dragleave dragover dragstart drop keydown keypress keyup mousedown mousemove mouseout mouseover mouseup mousewheel scroll'.split(' ');
+	var logHuman = function() {
+		var wfscr = document.createElement('script');
+		wfscr.type = 'text/javascript';
+		wfscr.async = true;
+		wfscr.src = url + '&r=' + Math.random();
+		(document.getElementsByTagName('head')[0]||document.getElementsByTagName('body')[0]).appendChild(wfscr);
+		for (var i = 0; i < evts.length; i++) {
+			removeEvent(evts[i], logHuman);
+		}
+	};
+	for (var i = 0; i < evts.length; i++) {
+		addEvent(evts[i], logHuman);
+	}
+})('//www.javacreed.com/?wordfence_logHuman=1&hid=0461DB3CC6C43D50E5368FEB86AD5A43');
+</script> <script type="text/javascript" src="./Java Fork Join Example _ Java Creed_files/checkOAuth.esi"></script><script type="text/javascript" src="./Java Fork Join Example _ Java Creed_files/checkOAuth.esi"></script><script type="text/javascript" src="./Java Fork Join Example _ Java Creed_files/getCount2.php"></script><script type="text/javascript" src="./Java Fork Join Example _ Java Creed_files/plusone.js" gapi_processed="true"></script><link rel="stylesheet" type="text/css" href="./Java Fork Join Example _ Java Creed_files/buttons.f48d075cabb93f026d23cf2c20db30d0.css"><script type="text/javascript" async="" src="./Java Fork Join Example _ Java Creed_files/saved_resource(1)"></script></head> <body class="single single-post postid-5257 single-format-standard  medium wpb-js-composer js-comp-ver-3.6.14.1 vc_responsive tt-scrolled" onclick="if(stWidget.buttonClicked==false){stWidget.stopClosing=false;stWidget.openDuration=0;stWidget.stClose(100);}">
+ 
+<header id="header"> <div class="navbar navbar-fixed-top" style="">
+<div class="header-inner clearfix">
+<div class="container"> <div class="btn-logo-container clearfix">
+<a id="logo" class="brand" href="http://www.javacreed.com/"><h1 class="site-name">Java Creed</h1></a> <div class="header-sidebar-container">
+<div class="row">
+</div>
+</div>
+</div>
+</div> </div>
+<div class="navbar-container">
+<div class="navbar-inner clearfix">
+<div class="container"> <div class="nav-toolbar-container">
+<div class="nav span8" id="navigation">
+<select id="main-menu-mobile" class="main-menu-mobile"><option value="">Select page</option><option value="http://www.javacreed.com/tutorials" id="menu-item-mobile-9">Tutorials</option><option value="http://www.javacreed.com/setting-up-the-environment/" id="menu-item-mobile-5162">&nbsp;&nbsp;&nbsp;Setting up the Environment</option>
+<option value="http://www.javacreed.com/first-steps/" id="menu-item-mobile-5073">&nbsp;&nbsp;&nbsp;First Steps</option>
+<option value="http://www.javacreed.com/simple-java-database-swing-application/" id="menu-item-mobile-5170">&nbsp;&nbsp;&nbsp;Simple Java Database Swing Application</option>
+<option value="http://www.javacreed.com/testing-swing-application/" id="menu-item-mobile-5169">&nbsp;&nbsp;&nbsp;Testing Swing Application</option>
+<option value="http://www.javacreed.com/category/articles/" id="menu-item-mobile-4581">Articles</option><option value="http://www.javacreed.com/category/intro/" id="menu-item-mobile-4358">&nbsp;&nbsp;&nbsp;Introduction</option>
+<option value="http://www.javacreed.com/category/collections-2/" id="menu-item-mobile-4519">&nbsp;&nbsp;&nbsp;Collections</option>
+<option value="http://www.javacreed.com/category/concurrency/" id="menu-item-mobile-4396">&nbsp;&nbsp;&nbsp;Concurrency</option>
+<option value="http://www.javacreed.com/category/dependency-injection/" id="menu-item-mobile-5284">&nbsp;&nbsp;&nbsp;Dependency Injection</option>
+<option value="http://www.javacreed.com/category/gson/" id="menu-item-mobile-4237">&nbsp;&nbsp;&nbsp;GSON</option>
+<option value="http://www.javacreed.com/category/io/" id="menu-item-mobile-5286">&nbsp;&nbsp;&nbsp;IO</option>
+<option value="http://www.javacreed.com/category/maven/" id="menu-item-mobile-4491">&nbsp;&nbsp;&nbsp;Maven</option>
+<option value="http://www.javacreed.com/category/object-oriented-programming/" id="menu-item-mobile-5285">&nbsp;&nbsp;&nbsp;Object Oriented Programming</option>
+<option value="http://www.javacreed.com/category/process/" id="menu-item-mobile-4447">&nbsp;&nbsp;&nbsp;Process</option>
+<option value="http://www.javacreed.com/category/spring/" id="menu-item-mobile-4446">&nbsp;&nbsp;&nbsp;Spring</option>
+<option value="http://www.javacreed.com/category/swing/" id="menu-item-mobile-4397">&nbsp;&nbsp;&nbsp;Swing</option>
+<option value="http://www.javacreed.com/category/testing/" id="menu-item-mobile-5287">&nbsp;&nbsp;&nbsp;Testing</option>
+<option value="http://www.javacreed.com/category/how-to/" id="menu-item-mobile-4543">How To</option><option value="http://www.javacreed.com/category/awt/" id="menu-item-mobile-4544">&nbsp;&nbsp;&nbsp;AWT</option>
+<option value="http://www.javacreed.com/category/io/" id="menu-item-mobile-5342">&nbsp;&nbsp;&nbsp;IO</option>
+<option value="http://www.javacreed.com/category/maven/" id="menu-item-mobile-4577">&nbsp;&nbsp;&nbsp;Maven</option>
+<option value="http://www.javacreed.com/category/utilities/" id="menu-item-mobile-4558">&nbsp;&nbsp;&nbsp;Utilities</option>
+<option value="http://www.javacreed.com/category/error/" id="menu-item-mobile-4699">Error</option>
+<option value="http://www.javacreed.com/clips/" id="menu-item-mobile-4788">Clips</option>
+<option value="http://www.javacreed.com/about-the-website/" id="menu-item-mobile-4494">About The Website</option>
+</select><ul id="menu" class="menu"><li id="menu-item-9" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-9   rel     showdropdown"><a title="Tutorials" href="http://www.javacreed.com/tutorials">Tutorials<span> </span></a>
+<ul class="children  ">
+<li id="menu-item-5162" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-5162   rel    "><a href="http://www.javacreed.com/setting-up-the-environment/">Setting up the Environment<span> </span></a> </li>
+<li id="menu-item-5073" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5073   rel    "><a href="http://www.javacreed.com/first-steps/">First Steps<span> </span></a> </li>
+<li id="menu-item-5170" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-5170   rel    "><a href="http://www.javacreed.com/simple-java-database-swing-application/">Simple Java Database Swing Application<span> </span></a> </li>
+<li id="menu-item-5169" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-5169   rel    "><a href="http://www.javacreed.com/testing-swing-application/">Testing Swing Application<span> </span></a> </li>
+<span class="mg-menu-tip" style="width:64px"></span></ul>
+</li>
+<li id="menu-item-4581" class="menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor current-menu-parent current-post-parent menu-item-has-children menu-item-4581   rel     showdropdown"><a href="http://www.javacreed.com/category/articles/">Articles<span> </span></a>
+<ul class="children  ">
+<li id="menu-item-4358" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-4358   rel    "><a href="http://www.javacreed.com/category/intro/">Introduction<span> </span></a> </li>
+<li id="menu-item-4519" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-4519   rel    "><a href="http://www.javacreed.com/category/collections-2/">Collections<span> </span></a> </li>
+<li id="menu-item-4396" class="menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor current-menu-parent current-post-parent menu-item-4396   rel    "><a href="http://www.javacreed.com/category/concurrency/">Concurrency<span> </span></a> </li>
+<li id="menu-item-5284" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-5284   rel    "><a href="http://www.javacreed.com/category/dependency-injection/">Dependency Injection<span> </span></a> </li>
+<li id="menu-item-4237" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-4237   rel    "><a href="http://www.javacreed.com/category/gson/">GSON<span> </span></a> </li>
+<li id="menu-item-5286" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-5286   rel    "><a href="http://www.javacreed.com/category/io/">IO<span> </span></a> </li>
+<li id="menu-item-4491" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-4491   rel    "><a href="http://www.javacreed.com/category/maven/">Maven<span> </span></a> </li>
+<li id="menu-item-5285" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-5285   rel    "><a href="http://www.javacreed.com/category/object-oriented-programming/">Object Oriented Programming<span> </span></a> </li>
+<li id="menu-item-4447" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-4447   rel    "><a href="http://www.javacreed.com/category/process/">Process<span> </span></a> </li>
+<li id="menu-item-4446" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-4446   rel    "><a href="http://www.javacreed.com/category/spring/">Spring<span> </span></a> </li>
+<li id="menu-item-4397" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-4397   rel    "><a href="http://www.javacreed.com/category/swing/">Swing<span> </span></a> </li>
+<li id="menu-item-5287" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-5287   rel    "><a href="http://www.javacreed.com/category/testing/">Testing<span> </span></a> </li>
+<span class="mg-menu-tip" style="width:67px"></span></ul>
+</li>
+<li id="menu-item-4543" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-has-children menu-item-4543   rel     showdropdown"><a href="http://www.javacreed.com/category/how-to/">How To<span> </span></a>
+<ul class="children  ">
+<li id="menu-item-4544" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-4544   rel    "><a href="http://www.javacreed.com/category/awt/">AWT<span> </span></a> </li>
+<li id="menu-item-5342" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-5342   rel    "><a href="http://www.javacreed.com/category/io/">IO<span> </span></a> </li>
+<li id="menu-item-4577" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-4577   rel    "><a href="http://www.javacreed.com/category/maven/">Maven<span> </span></a> </li>
+<li id="menu-item-4558" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-4558   rel    "><a href="http://www.javacreed.com/category/utilities/">Utilities<span> </span></a> </li>
+<span class="mg-menu-tip" style="width:60px"></span></ul>
+</li>
+<li id="menu-item-4699" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-4699   rel    "><a href="http://www.javacreed.com/category/error/">Error<span> </span></a> </li>
+<li id="menu-item-4788" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4788   rel    "><a href="http://www.javacreed.com/clips/">Clips<span> </span></a> </li>
+<li id="menu-item-4494" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4494   rel    "><a href="http://www.javacreed.com/about-the-website/">About The Website<span> </span></a> </li>
+</ul>
+</div>
+<div class="search-content">
+<form method="get" id="searchform" class="form-search " action="http://www.javacreed.com/">
+<div class="input-append"><button type="submit" id="searchsubmit"></button><input type="search" name="s" class="span2" id="appendedInputButton" onfocus="if(this.value==this.defaultValue)this.value=&#39;&#39;;" onblur="if(this.value==&#39;&#39;)this.value=this.defaultValue;"></div>
+</form> </div>
+</div>
+</div> </div>
+</div>
+    </div>
+</header>
+ 
+ 
+<div class="wrapper"> 
+<div id="prev" class="">
+<a href="http://www.javacreed.com/the-broken-singleton/">
+<div class="lightBoxNav navLeft"></div>
+</a>
+<a href="http://www.javacreed.com/the-broken-singleton/" class="link-content">
+<div class="prev_post"><h3 class="item-title">The Broken Singleton</h3><img src="./Java Fork Join Example _ Java Creed_files/The-Broken-Singleton-150x150.png" alt=""> </div>
+</a>
+</div> <div id="next" class="">
+<a href="http://www.javacreed.com/what-is-race-condition-and-how-to-prevent-it/">
+<div class="lightBoxNav navRight"></div>
+</a>
+<a href="http://www.javacreed.com/what-is-race-condition-and-how-to-prevent-it/" class="link-content">
+<div class="next_post">
+<h3 class="item-title">What is Race Condition and How to Prevent It?</h3><img src="./Java Fork Join Example _ Java Creed_files/What-is-Race-Condition-and-How-to-Prevent-It-150x150.png" alt=""> </div>
+</a>
+</div><section id="page" class="clearfix content-single">
+<div class="container"><div class="row">
+<div class="span12 content-container">
+<div class="row"> <div class="span9">
+<div class="item-single clearfix"> <header id="item-single-title-1" class="clearfix"> <h2 class="item-title"><a href="http://www.javacreed.com/java-fork-join-example/" title="Java Fork Join Example">Java Fork Join Example</a></h2> <span class="item-single-meta"><a>1 year ago</a> by <a href="http://www.javacreed.com/author/albert/" title="Posts by Albert Attard" rel="author">Albert Attard</a> in <a href="http://www.javacreed.com/category/articles/">Articles</a>, <a href="http://www.javacreed.com/category/concurrency/">Concurrency</a> <span>Tagged: </span><a href="http://www.javacreed.com/tag/fork-join/" rel="tag">Fork Join</a>, <a href="http://www.javacreed.com/tag/forkjoinpool/" rel="tag">ForkJoinPool</a>, <a href="http://www.javacreed.com/tag/forkjointask/" rel="tag">ForkJoinTask</a>, <a href="http://www.javacreed.com/tag/recursiveaction/" rel="tag">RecursiveAction</a>, <a href="http://www.javacreed.com/tag/recursivetask/" rel="tag">RecursiveTask</a> </span> </header>  
+<div class="tt-share-widget clearfix " id="sharing-1"><span class="st_twitter_hcount" displaytext="Tweet" st_processed="yes"><span style="text-decoration:none;color:#000000;display:inline-block;cursor:pointer;" class="stButton"><span><span class="stMainServices st-twitter-counter" style="background-image: url(&quot;http://w.sharethis.com/images/twitter_counter.png&quot;);">&nbsp;<img src="./Java Fork Join Example _ Java Creed_files/check-big.png" style="position: absolute; top: -7px; right: -7px; width: 19px; height: 19px; max-width: 19px; max-height: 19px; display: none;"></span><span class="stArrow"><span class="stButton_gradient stHBubble" style="display: inline-block;"><span class="stBubble_hcount">0</span></span></span></span></span></span><span class="st_plusone_hcount" displaytext="Google +1" st_processed="yes"><div style="display:inline-block;overflow:hidden;line-height:0px;position:relative;vertical-align:middle;bottom:0px;width:75px; height:21px;">&nbsp;<div id="___plusone_0" style="text-indent: 0px; margin: 0px; padding: 0px; border-style: none; float: none; line-height: normal; font-size: 1px; vertical-align: baseline; display: inline-block; width: 90px; height: 20px; background: transparent;"><iframe frameborder="0" hspace="0" marginheight="0" marginwidth="0" scrolling="no" style="position: static; top: 0px; width: 90px; margin: 0px; border-style: none; left: 0px; visibility: visible; height: 20px;" tabindex="0" vspace="0" width="100%" id="I0_1470049057593" name="I0_1470049057593" src="./Java Fork Join Example _ Java Creed_files/fastbutton.html" data-gapiattached="true" title="+1"></iframe></div></div></span><span class="st_linkedin_hcount" displaytext="LinkedIn" st_processed="yes"><span style="text-decoration:none;color:#000000;display:inline-block;cursor:pointer;" class="stButton"><span><span class="stMainServices st-linkedin-counter" style="background-image: url(&quot;http://w.sharethis.com/images/linkedin_counter.png&quot;);">&nbsp;<img src="./Java Fork Join Example _ Java Creed_files/check-big.png" style="position: absolute; top: -7px; right: -7px; width: 19px; height: 19px; max-width: 19px; max-height: 19px; display: none;"></span><span class="stArrow"><span class="stButton_gradient stHBubble" style="display: inline-block;"><span class="stBubble_hcount">0</span></span></span></span></span></span><span class="st_pinterest_hcount" displaytext="Pinterest" st_processed="yes"><span style="text-decoration:none;color:#000000;display:inline-block;cursor:pointer;" class="stButton"><span><span class="stMainServices st-pinterest-counter" style="background-image: url(&quot;http://w.sharethis.com/images/pinterest_counter.png&quot;);">&nbsp;<img src="./Java Fork Join Example _ Java Creed_files/check-big.png" style="position: absolute; top: -7px; right: -7px; width: 19px; height: 19px; max-width: 19px; max-height: 19px; display: none;"></span><span class="stArrow"><span class="stButton_gradient stHBubble" style="display: inline-block;"><span class="stBubble_hcount">0</span></span></span></span></span></span><span class="st_facebook_hcount" displaytext="Facebook" st_processed="yes"><span style="text-decoration:none;color:#000000;display:inline-block;cursor:pointer;" class="stButton"><span><span class="stMainServices st-facebook-counter" style="background-image: url(&quot;http://w.sharethis.com/images/facebook_counter.png&quot;);">&nbsp;<img src="./Java Fork Join Example _ Java Creed_files/check-big.png" style="position: absolute; top: -7px; right: -7px; width: 19px; height: 19px; max-width: 19px; max-height: 19px; display: none;"></span><span class="stArrow"><span class="stButton_gradient stHBubble" style="display: inline-block;"><span class="stBubble_hcount">16</span></span></span></span></span></span><span class="st_email_hcount" displaytext="Email" st_processed="yes"><span style="text-decoration:none;color:#000000;display:inline-block;cursor:pointer;" class="stButton"><span><span class="stMainServices st-email-counter" style="background-image: url(&quot;http://w.sharethis.com/images/email_counter.png&quot;);">&nbsp;<img src="./Java Fork Join Example _ Java Creed_files/check-big.png" style="position: absolute; top: -7px; right: -7px; width: 19px; height: 19px; max-width: 19px; max-height: 19px; display: none;"></span><span class="stArrow"><span class="stButton_gradient stHBubble" style="display: inline-block;"><span class="stBubble_hcount">0</span></span></span></span></span></span>​<span class="st_stumbleupon_hcount" displaytext="StumbleUpon" st_processed="yes"><span style="text-decoration:none;color:#000000;display:inline-block;cursor:pointer;" class="stButton"><span><span class="stButton_gradient"><span class="chicklets stumbleupon">StumbleUpon</span><img src="./Java Fork Join Example _ Java Creed_files/check-big.png" style="position: absolute; top: -7px; right: -7px; width: 19px; height: 19px; max-width: 19px; max-height: 19px; display: none;"></span><span class="stArrow"><span class="stButton_gradient stHBubble" style="display: inline-block;"><span class="stBubble_hcount">11</span></span></span></span></span></span>​</div> <section> <div class="item-image">
+<div class="entry-image clearfix">
+<div class="hover-content"> <img src="./Java Fork Join Example _ Java Creed_files/Java-Fork-Join-Example.png" alt="" style="width:100%; height:auto;">
+</div>
+</div>
+</div> <div class="item-content">
+<p>Java 7 introduced a new type of <code>ExecutorService</code> (<a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ExecutorService.html" target="_blank">Java Doc</a>) called <strong>Fork/Join Framework</strong> (<a href="https://docs.oracle.com/javase/tutorial/essential/concurrency/forkjoin.html" target="_blank">Tutorial</a>), which excels in handling recursive algorithms. Different from other implementations of the <code>ExecutorService</code>, the Fork/Join Framework uses a work-stealing algorithm (<a href="http://gee.cs.oswego.edu/dl/papers/fj.pdf" target="_blank">Paper</a>), which maximise the threads utilisation, and provides a simpler way to deal with tasks which spawn other tasks (referred to as <em>subtasks</em>).</p>
+<p>All code listed below is available at: <a href="https://github.com/javacreed/java-fork-join-example" target="_blank">https://github.com/javacreed/java-fork-join-example</a>. Most of the examples will not contain the whole code and may omit fragments which are not relevant to the example being discussed. The readers can download or view all code from the above link.</p>
+<p>This article provides a brief description of what is referred to as traditional executor service (so to called them) and how these work. It then introduces the Fork/Join Framework and describes how this differentiates from the traditional executor service. The third section in this article shows a practical example of the Fork/Join Framework and demonstrates most of its main components.</p>
+<h2>Executor Service</h2>
+<p>A bank, or post office, has several counters from where the customers are served at the branches. When a counter finishes with the current customer, the next customer in the queue will take its place and the person behind the counter, also referred to as the <em>employee</em>, starts serving the new customer. The employee will only serve one customer at a given point in time and the customers in the queue need to wait for their turn. Furthermore, the employees are very patient and will never ask their customers to leave or step aside, even if these are waiting for something else to happen. The following image shows a simple view of the customers waiting and the employees serving the customers at the head of the queue.</p>
+<div id="attachment_5264" style="width: 1169px" class="wp-caption aligncenter"><a href="./Java Fork Join Example _ Java Creed_files/Customers-waiting-for-their-turn.png" class="" rel="prettyphoto" title="Customers waiting for their turn"><img src="./Java Fork Join Example _ Java Creed_files/Customers-waiting-for-their-turn.png" alt="Customers waiting for their turn" width="1159" height="616" class="size-full wp-image-5264" srcset="http://www.javacreed.com/wp-content/uploads/2014/12/Customers-waiting-for-their-turn-300x159.png 300w, http://www.javacreed.com/wp-content/uploads/2014/12/Customers-waiting-for-their-turn-1024x544.png 1024w, http://www.javacreed.com/wp-content/uploads/2014/12/Customers-waiting-for-their-turn.png 1159w" sizes="(max-width: 1159px) 100vw, 1159px" title="" style="visibility: visible; opacity: 1;"></a><p class="wp-caption-text">Customers waiting for their turn</p></div>
+<p>Something similar happens in a multithreaded program where the <code>Thread</code>s (<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Thread.html" target="_blank">Java Doc</a>) represents the employees and the tasks to be carried out are the customers. The following image is identical to the above, with just the labels updated to use the programming terminology.</p>
+<div id="attachment_5265" style="width: 1186px" class="wp-caption aligncenter"><a href="./Java Fork Join Example _ Java Creed_files/Threads-and-Tasks.png" class="" rel="prettyphoto" title="Threads and Tasks"><img src="./Java Fork Join Example _ Java Creed_files/Threads-and-Tasks.png" alt="Threads and Tasks" width="1176" height="619" class="size-full wp-image-5265" srcset="http://www.javacreed.com/wp-content/uploads/2014/12/Threads-and-Tasks-1024x538.png 1024w, http://www.javacreed.com/wp-content/uploads/2014/12/Threads-and-Tasks-310x163.png 310w, http://www.javacreed.com/wp-content/uploads/2014/12/Threads-and-Tasks.png 1176w" sizes="(max-width: 1176px) 100vw, 1176px" title="" style="visibility: visible; opacity: 1;"></a><p class="wp-caption-text">Threads and Tasks</p></div>
+<p>This should help you relate these two aspects and better visualise the scenario being discussed.</p>
+<p>Most of the thread pools (<a href="https://docs.oracle.com/javase/tutorial/essential/concurrency/pools.html" target="_blank">Tutorial</a>) and executor services work in this manner. A <code>Thread</code> is assigned a <em>task</em> and will only move to the next <em>task</em> once the one at hand is finished. Tasks can take quite a long time to finish and may block waiting for something else to happen. This works well in many cases, but fails badly with problems that need to be solved recursively.</p>
+<p>Let us use the same analogy that we used before with the customer waiting in the queue. Say that <em>Customer 1</em>, who is being served by <em>Employee 1</em>, needs some information from <em>Customer 6</em>, who is not yet in the queue. He or she (<em>Customer 1</em>) calls their friend (<em>Customer 6</em>) and waits for him or her (<em>Customer 6</em>) to come to the bank. In the meantime, <em>Customer 1</em> stays at the counter occupying <em>Employee 1</em>. As mentioned before, the employees are very patient and will never send a customer back to the queue or ask them to step aside until all his or her dependencies are resolved. <em>Customer 6</em> arrives and queues as shown below.</p>
+<div id="attachment_5267" style="width: 1173px" class="wp-caption aligncenter"><a href="./Java Fork Join Example _ Java Creed_files/Old-Customer-waiting-for-New-Customer.png" class="" rel="prettyphoto" title="Old Customer waiting for New Customer"><img src="./Java Fork Join Example _ Java Creed_files/Old-Customer-waiting-for-New-Customer.png" alt="Old Customer waiting for New Customer" width="1163" height="601" class="size-full wp-image-5267" srcset="http://www.javacreed.com/wp-content/uploads/2014/12/Old-Customer-waiting-for-New-Customer-300x155.png 300w, http://www.javacreed.com/wp-content/uploads/2014/12/Old-Customer-waiting-for-New-Customer-1024x529.png 1024w, http://www.javacreed.com/wp-content/uploads/2014/12/Old-Customer-waiting-for-New-Customer-310x160.png 310w, http://www.javacreed.com/wp-content/uploads/2014/12/Old-Customer-waiting-for-New-Customer.png 1163w" sizes="(max-width: 1163px) 100vw, 1163px" title="" style="visibility: visible; opacity: 1;"></a><p class="wp-caption-text">Old Customer waiting for New Customer</p></div>
+<p>With <em>Customer 1</em> still occupying an employee, and for the sake of this argument the other customers, <em>Customer 2</em> and <em>Customer 3</em>, too do the same (that is wait for something which is queued), then we have a deadlock. All employees are occupied by customers that are waiting for something to happen. Therefore the employees will never be free to serve the other customers.</p>
+<p>In this example we saw a weakness of the traditional executor services when dealing with tasks, which in turn depend on other tasks created by them (referred to as subtasks). This is very common in recursive algorithms such as Towers of Hanoi (<a href="http://en.wikipedia.org/wiki/Tower_of_Hanoi" target="_blank">Wiki</a>) or exploring a tree like data structure (calculating the total size of a directory). The Fork/Join Framework was designed to address such problems as we will see in the following section. Later on in this article we will also see an example of the problem discussed in this section.</p>
+<h2>Fork/Join Framework</h2>
+<p>The main weakness of the traditional executor service implementations when dealing with tasks, which in turn depend on other subtasks, is that a thread is not able to put a task back to the queue or to the side and then serves/executes an new task. The Fork/Join Framework addresses this limitation by introducing another layer between the tasks and the threads executing them, which allows the threads to put blocked tasks on the side and deal with them when all their dependencies are executed. In other words, if <em>Task 1</em> depends on <em>Task 6</em>, which task (<em>Task 6</em>) was created by <em>Task 1</em>, then <em>Task 1</em> is placed on the side and is only executed once <em>Task 6</em> is executed. This frees the thread from <em>Task 1</em>, and allows it to execute other tasks, something which is not possible with the traditional executor service implementations.</p>
+<p>This is achieved by the use of <em>fork</em> and <em>join</em> operations provided by the framework (hence the name Fork/Join). <em>Task 1</em> forks <em>Task 6</em> and then joins it to wait for the result. The fork operation puts <em>Task 6</em> on the queue while the join operation allows <em>Thread 1</em> to put <em>Task 1</em> on the side until <em>Task 6</em> completes. This is how the fork/join works, fork pushes new things to the queue while the join causes the current task to be sided until it can proceed, thus blocking no threads.</p>
+<p>The Fork/Join Framework makes use of a special kind of thread pool called <code>ForkJoinPool</code> (<a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ForkJoinPool.html" target="_blank">Java Doc</a>), which differentiates it from the rest. <code>ForkJoinPool</code> implements a work-stealing algorithm and can execute <code>ForkJoinTask</code> (<a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ForkJoinTask.html" target="_blank">Java Doc</a>) objects. The <code>ForkJoinPool</code> maintains a number of threads, which number is typically based on the number of CPUs available. Each thread has a special kind of queue, <code>Deque</code>s (<a href="https://docs.oracle.com/javase/7/docs/api/java/util/Deque.html" target="_blank">Java Doc</a>), where all its tasks are placed. This is quite an important point to understand. The threads do not share a common queue, but each thread has its own queue as shown next.</p>
+<div id="attachment_5270" style="width: 1395px" class="wp-caption aligncenter"><a href="./Java Fork Join Example _ Java Creed_files/Threads-and-their-Queues.png" class="" rel="prettyphoto" title="Threads and their Queues"><img src="./Java Fork Join Example _ Java Creed_files/Threads-and-their-Queues.png" alt="Threads and their Queues" width="1385" height="772" class="size-full wp-image-5270" srcset="http://www.javacreed.com/wp-content/uploads/2014/12/Threads-and-their-Queues-300x167.png 300w, http://www.javacreed.com/wp-content/uploads/2014/12/Threads-and-their-Queues-1024x570.png 1024w, http://www.javacreed.com/wp-content/uploads/2014/12/Threads-and-their-Queues.png 1385w" sizes="(max-width: 1385px) 100vw, 1385px" title="" style="visibility: visible; opacity: 1;"></a><p class="wp-caption-text">Threads and their Queues</p></div>
+<p>The above image illustrates another queue that each thread has (lower part of the image). This queue, so to call it, allows the threads to put aside tasks which are blocked waiting for something else to happen. In other words, if the current task cannot proceed (as it performs a <em>join</em> on a subtask), then it is placed on this queue until all of its dependencies are ready.</p>
+<p>New tasks are added to the thread’s queue (using the <em>fork</em> operation) and each thread always processes the last task added to its queue. This is quite important. If the queue of a thread has two tasks, the last task added to the queue is processed first. This is referred to as last in first out, LIFO (<a href="http://en.wikipedia.org/wiki/LIFO_%28computing%29" target="_blank">Wiki</a>). </p>
+<div id="attachment_5271" style="width: 1395px" class="wp-caption aligncenter"><a href="./Java Fork Join Example _ Java Creed_files/Task1-and-Task2.png" class="" rel="prettyphoto" title="Task 1 and Task 2"><img src="./Java Fork Join Example _ Java Creed_files/Task1-and-Task2.png" alt="Task 1 and Task 2" width="1385" height="772" class="size-full wp-image-5271" srcset="http://www.javacreed.com/wp-content/uploads/2014/12/Task1-and-Task2-300x167.png 300w, http://www.javacreed.com/wp-content/uploads/2014/12/Task1-and-Task2-1024x570.png 1024w, http://www.javacreed.com/wp-content/uploads/2014/12/Task1-and-Task2.png 1385w" sizes="(max-width: 1385px) 100vw, 1385px" title="" style="visibility: visible; opacity: 1;"></a><p class="wp-caption-text">Task 1 and Task 2</p></div>
+<p>In the above image, <em>Thread 1</em> has two tasks in its queue, where <em>Task 1</em> was added to the queue before <em>Task 2</em>. Therefore, <em>Task 2</em> will be executed first by <em>Thread 1</em> and then it executes <em>Task 1</em>. Any idle threads can take tasks from the other threads queues if available, that is, work-stealing. A thread will always steal oldest tasks from some other thread’s queue as shown in the following image.</p>
+<div id="attachment_5272" style="width: 1395px" class="wp-caption aligncenter"><a href="./Java Fork Join Example _ Java Creed_files/Task-1-was-stolen-by-Thread-2.png" class="" rel="prettyphoto" title="Task 1 was stolen by Thread 2"><img src="./Java Fork Join Example _ Java Creed_files/Task-1-was-stolen-by-Thread-2.png" alt="Task 1 was stolen by Thread 2" width="1385" height="772" class="size-full wp-image-5272" srcset="http://www.javacreed.com/wp-content/uploads/2014/12/Task-1-was-stolen-by-Thread-2-300x167.png 300w, http://www.javacreed.com/wp-content/uploads/2014/12/Task-1-was-stolen-by-Thread-2-1024x570.png 1024w, http://www.javacreed.com/wp-content/uploads/2014/12/Task-1-was-stolen-by-Thread-2.png 1385w" sizes="(max-width: 1385px) 100vw, 1385px" title="" style="visibility: visible; opacity: 1;"></a><p class="wp-caption-text">Task 1 was stolen by Thread 2</p></div>
+<p>As shown in the above image, <em>Thread 2</em> stole the oldest task, <em>Task 1</em>, from <em>Thread 1</em>. As a rule of thumb, threads will always attempt to steal from their neighbouring thread to minimise the contention that may be created during the work stealing.</p>
+<p>The order in which tasks are executed and stolen is quite important. Ideally, work-stealing does not happen a lot as this has a cost. When a task is moved from one thread to another, the context related with this task needs to be moved from one thread’s stack to another. The threads may be (and the Fork/Join framework spread work across all CPUs) on another CPU. Moving thread context from one CPU to another can be even slower. Therefore, the Fork/Join Framework minimises this as described next.</p>
+<p>A recursive algorithm starts with a large problem and applies a divide-and-conquer technique to break down the problem into smaller parts, until these are small enough to be solved directly. The first task added to the queue is the largest task. The first task will break the problem into a set of smaller tasks, which tasks are added to the queue as shown next.</p>
+<div id="attachment_5273" style="width: 922px" class="wp-caption aligncenter"><a href="./Java Fork Join Example _ Java Creed_files/Tasks-and-Subtasks.png" class="" rel="prettyphoto" title="Tasks and Subtasks"><img src="./Java Fork Join Example _ Java Creed_files/Tasks-and-Subtasks.png" alt="Tasks and Subtasks" width="912" height="588" class="size-full wp-image-5273" srcset="http://www.javacreed.com/wp-content/uploads/2014/12/Tasks-and-Subtasks-300x193.png 300w, http://www.javacreed.com/wp-content/uploads/2014/12/Tasks-and-Subtasks.png 912w" sizes="(max-width: 912px) 100vw, 912px" title="" style="visibility: visible; opacity: 1;"></a><p class="wp-caption-text">Tasks and Subtasks</p></div>
+<p><em>Task 1</em> represents our problem, which is divided into two tasks, <em>Task 2</em> is small enough to solve as is, but <em>Task 3</em> needs to be divided further. Tasks <em>Task 4</em> and <em>Task 5</em> are small enough and these require no further splitting. This represents a typical recursive algorithm which can be split into smaller parts and then aggregates the results when ready. A practical example of such algorithm is calculating the size of a directory. We know that the size of a directory is equal to the size of its files.</p>
+<div id="attachment_5274" style="width: 922px" class="wp-caption aligncenter"><a href="./Java Fork Join Example _ Java Creed_files/Directories-and-Files.png" class="" rel="prettyphoto" title="Directories and Files"><img src="./Java Fork Join Example _ Java Creed_files/Directories-and-Files.png" alt="Directories and Files" width="912" height="588" class="size-full wp-image-5274" srcset="http://www.javacreed.com/wp-content/uploads/2014/12/Directories-and-Files-300x193.png 300w, http://www.javacreed.com/wp-content/uploads/2014/12/Directories-and-Files.png 912w" sizes="(max-width: 912px) 100vw, 912px" title="" style="visibility: visible; opacity: 1;"></a><p class="wp-caption-text">Directories and Files</p></div>
+<p>Therefore the size of <em>Dir 1</em> is equal to the size of <em>File 2</em> plus the size of <em>Dir 3</em>. Since <em>Dir 3</em> is a directory, its size is equal to the size of its content. In other words, the size of <em>Dir 3</em> is equal to the size of <em>File 4</em> plus the size of <em>File 5</em>.</p>
+<p>Let us see how this is executed. We start with one task, that is, to compute the size of directory as shown in the following image.</p>
+<div id="attachment_5275" style="width: 1395px" class="wp-caption aligncenter"><a href="./Java Fork Join Example _ Java Creed_files/Step-1-Start-with-Task-1.png" class="" rel="prettyphoto" title="Step 1 - Start with Task 1"><img src="./Java Fork Join Example _ Java Creed_files/Step-1-Start-with-Task-1.png" alt="Step 1 - Start with Task 1" width="1385" height="772" class="size-full wp-image-5275" srcset="http://www.javacreed.com/wp-content/uploads/2014/12/Step-1-Start-with-Task-1-300x167.png 300w, http://www.javacreed.com/wp-content/uploads/2014/12/Step-1-Start-with-Task-1-1024x570.png 1024w, http://www.javacreed.com/wp-content/uploads/2014/12/Step-1-Start-with-Task-1.png 1385w" sizes="(max-width: 1385px) 100vw, 1385px" title="" style="visibility: visible; opacity: 1;"></a><p class="wp-caption-text">Step 1 – Start with Task 1</p></div>
+<p><em>Thread 1</em> will take <em>Task 1</em> which tasks forks two other subtasks. These tasks are added to the queue of <em>Thread 1</em> as shown in the next image.</p>
+<div id="attachment_5276" style="width: 1395px" class="wp-caption aligncenter"><a href="./Java Fork Join Example _ Java Creed_files/Step-2-Add-subtasks-Task-2-and-Task-3.png" class="" rel="prettyphoto" title="Step 2 - Add subtasks Task 2 and Task 3"><img src="./Java Fork Join Example _ Java Creed_files/Step-2-Add-subtasks-Task-2-and-Task-3.png" alt="Step 2 - Add subtasks Task 2 and Task 3" width="1385" height="772" class="size-full wp-image-5276" srcset="http://www.javacreed.com/wp-content/uploads/2014/12/Step-2-Add-subtasks-Task-2-and-Task-3-300x167.png 300w, http://www.javacreed.com/wp-content/uploads/2014/12/Step-2-Add-subtasks-Task-2-and-Task-3-1024x570.png 1024w, http://www.javacreed.com/wp-content/uploads/2014/12/Step-2-Add-subtasks-Task-2-and-Task-3.png 1385w" sizes="(max-width: 1385px) 100vw, 1385px" title="" style="visibility: visible; opacity: 1;"></a><p class="wp-caption-text">Step 2 – Add subtasks Task 2 and Task 3</p></div>
+<p><em>Task 1</em> is waiting for the subtasks, <em>Task 2</em> and <em>Task 3</em> to finish, thus is pushed aside which frees <em>Thread 1</em>. To use better terminology, <em>Task 1</em> joins the subtasks <em>Task 2</em> and <em>Task 3</em>. <em>Thread 1</em> starts executing <em>Task 3</em> (the last task added to its queue), while <em>Thread 2</em> steals <em>Task 2</em>. </p>
+<div id="attachment_5277" style="width: 1395px" class="wp-caption aligncenter"><a href="./Java Fork Join Example _ Java Creed_files/Step-3-Thread-2-steals-Task-2.png" class="" rel="prettyphoto" title="Step 3 - Thread 2 steals Task 2"><img src="./Java Fork Join Example _ Java Creed_files/Step-3-Thread-2-steals-Task-2.png" alt="Step 3 - Thread 2 steals Task 2" width="1385" height="772" class="size-full wp-image-5277" srcset="http://www.javacreed.com/wp-content/uploads/2014/12/Step-3-Thread-2-steals-Task-2-300x167.png 300w, http://www.javacreed.com/wp-content/uploads/2014/12/Step-3-Thread-2-steals-Task-2-1024x570.png 1024w, http://www.javacreed.com/wp-content/uploads/2014/12/Step-3-Thread-2-steals-Task-2.png 1385w" sizes="(max-width: 1385px) 100vw, 1385px" title="" style="visibility: visible; opacity: 1;"></a><p class="wp-caption-text">Step 3 – Thread 2 steals Task 2</p></div>
+<p>Note that <em>Thread 1</em> has already started processing its second task, while <em>Thread 3</em> is still idle. As we will see later on, the threads will not perform the same number of work and the first thread will always produce more than the last thread. <em>Task 3</em> forks two more subtasks which are added to the queue of the thread that is executing it. Therefore, two more tasks are added to <em>Thread 1</em>‘s queue. <em>Thread 2</em>, ready from <em>Task 2</em>, steals again another task as shown next.</p>
+<div id="attachment_5278" style="width: 1395px" class="wp-caption aligncenter"><a href="./Java Fork Join Example _ Java Creed_files/Step-4-Thread-2-steals-Task-4.png" class="" rel="prettyphoto" title="Step 4 - Thread 2 steals Task 4"><img src="./Java Fork Join Example _ Java Creed_files/Step-4-Thread-2-steals-Task-4.png" alt="Step 4 - Thread 2 steals Task 4" width="1385" height="772" class="size-full wp-image-5278" srcset="http://www.javacreed.com/wp-content/uploads/2014/12/Step-4-Thread-2-steals-Task-4-300x167.png 300w, http://www.javacreed.com/wp-content/uploads/2014/12/Step-4-Thread-2-steals-Task-4-1024x570.png 1024w, http://www.javacreed.com/wp-content/uploads/2014/12/Step-4-Thread-2-steals-Task-4.png 1385w" sizes="(max-width: 1385px) 100vw, 1385px" title="" style="visibility: visible; opacity: 1;"></a><p class="wp-caption-text">Step 4 – Thread 2 steals Task 4</p></div>
+<p>In the above example, we saw that <em>Thread 3</em> never executed a task. This is because we only have very little subtasks. Once <em>Task 4</em> and <em>Task 5</em> are ready, their results are used to compute <em>Task 3</em> and then <em>Task 1</em>.</p>
+<p>As hinted before, the work is not evenly distributed among threads. The following chart shows how the work is distributed amongst threads when calculating the size of a reasonably large directory.</p>
+<div id="attachment_5279" style="width: 513px" class="wp-caption aligncenter"><a href="./Java Fork Join Example _ Java Creed_files/Work-Distribution.png" class="" rel="prettyphoto" title="Work Distribution"><img src="./Java Fork Join Example _ Java Creed_files/Work-Distribution.png" alt="Work Distribution" width="503" height="380" class="size-full wp-image-5279" srcset="http://www.javacreed.com/wp-content/uploads/2014/12/Work-Distribution-310x234.png 310w, http://www.javacreed.com/wp-content/uploads/2014/12/Work-Distribution.png 503w" sizes="(max-width: 503px) 100vw, 503px" title="" style="visibility: visible; opacity: 1;"></a><p class="wp-caption-text">Work Distribution</p></div>
+<p>In the above example four threads were used. As expected, Thread 1 performs almost 40% of the work while Thread 4 (the last thread) performs slightly more than 5% of the work. This is another important principle to understand. The Fork/Join Framework will not distribute work amongst threads evenly and will try to minimise the number of threads utilised. The second threads will only take work from the first thread is this is not cooping. As mentioned before, moving tasks between threads has a cost which the framework tries to minimise.</p>
+<p>This section described on some detail how the Fork/Join Framework works and how threads steal work from other threads’ queue. In the following section we will see several practical example of the Fork/Join Framework and will analyse the obtained results.</p>
+<h2>Calculate Directory Total Size</h2>
+<p>To demonstrate the use of the Fork/Join Framework, we will calculate the size of a directory, which problem can be solved recursively. The size of file can determined by the method <code>length()</code> (<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html#length()" target="_blank">Java Doc</a>). The size of a directory is equal to the size of all its files. </p>
+<p>We will use several approaches to calculate the size of a directory, some of which will use the Fork/Join Framework, and we will analyse the obtained results in each case.</p>
+<h3>Using a Single Thread (no-concurrency)</h3>
+<p>The first example will not make use of threads and simple defines the algorithm to the used.</p>
+<pre>package com.javacreed.examples.concurrency.part1;
+
+import java.io.File;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class DirSize {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(DirSize.class);
+  
+  public static long sizeOf(final File file) {
+    DirSize.LOGGER.debug("Computing size of: {}", file);
+    
+    long size = 0;
+
+    <span class="comments">// Ignore files which are not files and dirs</span>
+    if (file.isFile()) {
+      size = file.length();
+    } else {
+      final File[] children = file.listFiles();
+      if (children != null) {
+        for (final File child : children) {
+          size += DirSize.sizeOf(child);
+        }
+      }
+    }
+
+    return size;
+  }
+}
+</pre>
+<p>The class <code>DirSize </code> has a single method called <code>sizeOf()</code>, which method takes a <code>File</code> (<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html" target="_blank">Java Doc</a>) instance as its argument. If this instance is a file, then the method returns the file’s length otherwise, if this is a directory, this method calls the method <code>sizeOf()</code> for each of the files within the directory and returns the total size.</p>
+<p>The following example shows how to run this example, using the file path as defined by <code>FilePath.TEST_DIR</code> constant.</p>
+<pre>package com.javacreed.examples.concurrency.part1;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.javacreed.examples.concurrency.utils.FilePath;
+
+public class Example1 {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(Example1.class);
+
+  public static void main(final String[] args) {
+    final long start = System.nanoTime();
+    final long size = DirSize.sizeOf(FilePath.TEST_DIR);
+    final long taken = System.nanoTime() - start;
+
+    Example1.LOGGER.debug("Size of '{}': {} bytes (in {} nano)", FilePath.TEST_DIR, size, taken);
+  }
+}
+</pre>
+<p>The above example will compute the size of the directory and will print all visited files before printing the total size. The following fragment only shows the last line which is the size of the <em>downloads</em> directory under a test folder (<code>C:\Test\</code>) together with the time taken to compute the size.</p>
+<pre>...
+16:55:38.045 [main] INFO Example1.java:38 - Size of 'C:\Test\': 113463195117 bytes (in 4503253988 nano) 
+</pre>
+<p>To disable the logs for each file visited, simple change the log level to <code>INFO</code> (in the <code>log4j.properties</code>) and the logs will only show the final results.</p>
+<pre>log4j.rootCategory=warn, R
+log4j.logger.com.javacreed=<span class="highlight">info</span>, stdout
+</pre>
+<p>Please note that the logging will only make things slower. In fact if you run the example without logs (or the logs set to <code>INFO</code>), the size of the directory is computed much faster.</p>
+<p>In order to obtain a more reliable result, we will run the same test several times and return the average time taken as shown next.</p>
+<pre>package com.javacreed.examples.concurrency.part1;
+
+import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.javacreed.examples.concurrency.utils.FilePath;
+import com.javacreed.examples.concurrency.utils.Results;
+
+public class Example2 {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(Example1.class);
+
+  public static void main(final String[] args) {
+    final Results results = new Results();
+    for (int i = 0; i &lt; 5; i++) {
+      results.startTime();
+      final long size = DirSize.sizeOf(FilePath.TEST_DIR);
+      final long taken = results.endTime();
+      Example2.LOGGER.info("Size of '{}': {} bytes (in {} nano)", FilePath.TEST_DIR, size, taken);
+    }
+
+    final long takenInNano = results.getAverageTime();
+    Example2.LOGGER.info("Average: {} nano ({} seconds)", takenInNano, TimeUnit.NANOSECONDS.toSeconds(takenInNano));
+  }
+}
+</pre>
+<p>The same test is executed five times and the average result is printed last as shown next.</p>
+<pre>16:58:00.496 [main] INFO Example2.java:42 - Size of 'C:\Test\': 113463195117 bytes (in 4266090211 nano)
+16:58:04.728 [main] INFO Example2.java:42 - Size of 'C:\Test\': 113463195117 bytes (in 4228931534 nano)
+16:58:08.947 [main] INFO Example2.java:42 - Size of 'C:\Test\': 113463195117 bytes (in 4224277634 nano)
+16:58:13.205 [main] INFO Example2.java:42 - Size of 'C:\Test\': 113463195117 bytes (in 4253856753 nano)
+16:58:17.439 [main] INFO Example2.java:42 - Size of 'C:\Test\': 113463195117 bytes (in 4235732903 nano)
+16:58:17.439 [main] INFO Example2.java:46 - Average: 4241777807 nano (4 seconds)
+</pre>
+<h3>RecursiveTask</h3>
+<p>The Fork/Join Framework provides two types of tasks, the <code>RecursiveTask</code> (<a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/RecursiveTask.html" target="_blank">Java Doc</a>) and the <code>RecursiveAction</code> (<a href="http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/RecursiveAction.html" target="_blank">Java Doc</a>). In this section we will only talk about the <code>RecursiveTask</code>. The <code>RecursiveAction</code> is discussed later on.</p>
+<p>A <code>RecursiveTask</code> is a task that when executed it returns a value. Therefore, such task returns the result of the computation. In our case, the task returns the size of the file or directory it represents. The class <code>DirSize</code> was modified to make use of <code>RecursiveTask</code> as shown next.</p>
+<pre>package com.javacreed.examples.concurrency.part2;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveTask;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class DirSize {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(DirSize.class);
+
+  private static class SizeOfFileTask extends RecursiveTask&lt;Long&gt; {
+
+    private static final long serialVersionUID = -196522408291343951L;
+
+    private final File file;
+
+    public SizeOfFileTask(final File file) {
+      this.file = Objects.requireNonNull(file);
+    }
+
+    @Override
+    protected Long compute() {
+      DirSize.LOGGER.debug("Computing size of: {}", file);
+
+      if (file.isFile()) {
+        return file.length();
+      }
+
+      final List&lt;SizeOfFileTask&gt; tasks = new ArrayList&lt;&gt;();
+      final File[] children = file.listFiles();
+      if (children != null) {
+        for (final File child : children) {
+          final SizeOfFileTask task = new SizeOfFileTask(child);
+          task.fork();
+          tasks.add(task);
+        }
+      }
+
+      long size = 0;
+      for (final SizeOfFileTask task : tasks) {
+        size += task.join();
+      }
+
+      return size;
+    }
+  }
+
+  public static long sizeOf(final File file) {
+    final ForkJoinPool pool = new ForkJoinPool();
+    try {
+      return pool.invoke(new SizeOfFileTask(file));
+    } finally {
+      pool.shutdown();
+    }
+  }
+
+  private DirSize() {}
+
+}
+</pre>
+<p>Let us break this class into smaller parts and describe each separately.</p>
+<ol>
+<li>
+The class has a private constructor because it was not meant to be initialised. Therefore there is no point to initialise it (creating objects of this type) and in order to prevent someone to initialising it, we made the constructor <code>private</code>. All methods are static and these can be called against the class directly.<p></p>
+<pre>  private DirSize() {}
+</pre>
+</li>
+<li>
+The method <code>sizeOf()</code> does not compute the size of the file or directory. Instead it creates an instance of the <code>ForkJoinPool</code> and starts the computational process. It waits for the directory size to be computed and finally it shut down the pool before exiting.<p></p>
+<pre>  public static long sizeOf(final File file) {
+    final ForkJoinPool pool = new ForkJoinPool();
+    try {
+      return pool.invoke(new SizeOfFileTask(file));
+    } finally {
+      pool.shutdown();
+    }
+  }
+</pre>
+<p>The threads created by the <code>ForkJoinPool</code> are daemon threads by default. Some articles advice against the need of shutting this pool down since these threads will not prevent the VM from shutting down. With that said, I recommend to shut down and dispose of any objects properly when these are no longer needed. These daemon threads may be left idle for long time even when these are not required anymore.
+</p></li>
+<li>
+The method <code>sizeOf()</code> creates an instance <code>SizeOfFileTask</code>, which class extends <code>RecursiveTask&lt;Long&gt;</code>. Therefore the invoke method will return the objects/value returned by this task.<p></p>
+<pre>      return pool.invoke(new SizeOfFileTask(file));
+</pre>
+<p>Note that the above code will block until the size of the directory is computed. In other words the above code will wait for the task (and all the subtasks) to finish working before continuing.
+</p></li>
+<li>
+The class <code>SizeOfFileTask</code> is an inner class within the <code>DirSize</code> class.<p></p>
+<pre>  private static class SizeOfFileTask extends RecursiveTask&lt;Long&gt; {
+
+    private static final long serialVersionUID = -196522408291343951L;
+
+    private final File file;
+
+    public SizeOfFileTask(final File file) {
+      this.file = Objects.requireNonNull(file);
+    }
+
+    @Override
+    protected Long compute() {
+      <span class="comments">// Removed for brevity</span>
+    }
+  }
+</pre>
+<p>It takes the file (which can be a directory) for which size is to be computed as argument of its sole constructor, which file cannot be <code>null</code>. The <code>compute()</code> method is responsible from computing the work of this task. In this case the size of the file or directory, which method is discussed next.
+</p></li>
+<li>
+The <code>compute()</code> method determines whether the file passed to its constructor is a file or directory and acts accordingly.<p></p>
+<pre>    @Override
+    protected Long compute() {
+      DirSize.LOGGER.debug("Computing size of: {}", file);
+
+      if (file.isFile()) {
+        return file.length();
+      }
+
+      final List&lt;SizeOfFileTask&gt; tasks = new ArrayList&lt;&gt;();
+      final File[] children = file.listFiles();
+      if (children != null) {
+        for (final File child : children) {
+          final SizeOfFileTask task = new SizeOfFileTask(child);
+          task.fork();
+          tasks.add(task);
+        }
+      }
+
+      long size = 0;
+      for (final SizeOfFileTask task : tasks) {
+        size += task.join();
+      }
+
+      return size;
+    }
+</pre>
+<p>If the file is a file, then the method simply returns its size as shown next.</p>
+<pre>      if (file.isFile()) {
+        return file.length();
+      }
+</pre>
+<p>Otherwise, if the file is a directory, it lists all its sub-files and creates a new instance of <code>SizeOfFileTask</code> for each of these sub-files.</p>
+<pre>      final List&lt;SizeOfFileTask&gt; tasks = new ArrayList&lt;&gt;();
+      final File[] children = file.listFiles();
+      if (children != null) {
+        for (final File child : children) {
+          final SizeOfFileTask task = new SizeOfFileTask(child);
+          task.fork();
+          tasks.add(task);
+        }
+      }
+</pre>
+<p>For each instance of the created <code>SizeOfFileTask</code>, the <code>fork()</code> method is called. The <code>fork()</code> method causes the new instance of <code>SizeOfFileTask</code> to be added to this thread’s queue. All created instances of <code>SizeOfFileTask</code> are saved in a list, called <code>tasks</code>. Finally, when all tasks are forked, we need to wait for them to finish summing up their values.</p>
+<pre>      long size = 0;
+      for (final SizeOfFileTask task : tasks) {
+        size += task.join();
+      }
+
+      return size;
+</pre>
+<p>This is done by the <code>join()</code> method. This <code> join()</code> will force this task to stop, step aside if needs be, and wait for the subtask to finish. The value returned by all subtasks is added to the value of the variable <code>size</code> which is returned as the size of this directory.
+</p></li>
+</ol>
+<p>The Fork/Join Framework is more complex when compared with the simpler version which does not use multithreading. This is a fair point, but the simpler version is 4 times slower. The Fork/Join example took on average a second to compute the size, while the non-threading version took 4 seconds on average as shown next.</p>
+<pre>16:59:19.557 [main] INFO Example3.java:42 - Size of 'C:\Test\': 113463195117 bytes (in 2218013380 nano)
+16:59:21.506 [main] INFO Example3.java:42 - Size of 'C:\Test\': 113463195117 bytes (in 1939781438 nano)
+16:59:23.505 [main] INFO Example3.java:42 - Size of 'C:\Test\': 113463195117 bytes (in 2004837684 nano)
+16:59:25.363 [main] INFO Example3.java:42 - Size of 'C:\Test\': 113463195117 bytes (in 1856820890 nano)
+16:59:27.149 [main] INFO Example3.java:42 - Size of 'C:\Test\': 113463195117 bytes (in 1782364124 nano)
+16:59:27.149 [main] INFO Example3.java:46 - Average: 1960363503 nano (1 seconds)
+</pre>
+<p>In this section we saw how multithreading help us in improving the performance of our program. In the next section we will see the how inappropriate use of multithreading can make things worse.</p>
+<h3>ExecutorService</h3>
+<p>In the previous example we saw how concurrency improved the performance of our algorithm. When misused, multithreading can provide poor results as we will see in this section. We will try to solve this problem using a traditional executor service.</p>
+<p><strong>Please note that the code shown in this section is broken and does not work. It will hang forever and is only included for demonstration purpose.</strong></p>
+<p>The class <code>DirSize</code> was modified to work with <code>ExecutorService</code> and <code>Callable</code> (<a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/Callable.html" target="_blank">Java Doc</a>).</p>
+<pre>package com.javacreed.examples.concurrency.part3;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * This example is broken and suffers from deadlock and is only included for documentation purpose.
+ *
+ * @author Albert Attard
+ *
+ */
+public class DirSize {
+
+  private static class SizeOfFileCallable implements Callable&lt;Long&gt; {
+
+    private final File file;
+    private final ExecutorService executor;
+
+    public SizeOfFileCallable(final File file, final ExecutorService executor) {
+      this.file = Objects.requireNonNull(file);
+      this.executor = Objects.requireNonNull(executor);
+    }
+
+    @Override
+    public Long call() throws Exception {
+      DirSize.LOGGER.debug("Computing size of: {}", file);
+      long size = 0;
+
+      if (file.isFile()) {
+        size = file.length();
+      } else {
+        final List&lt;Future&lt;Long&gt;&gt; futures = new ArrayList&lt;&gt;();
+        for (final File child : file.listFiles()) {
+          futures.add(executor.submit(new SizeOfFileCallable(child, executor)));
+        }
+
+        for (final Future&lt;Long&gt; future : futures) {
+          size += future.get();
+        }
+      }
+
+      return size;
+    }
+  }
+
+  public static &lt;T&gt; long sizeOf(final File file) {
+    final int threads = Runtime.getRuntime().availableProcessors();
+    DirSize.LOGGER.debug("Creating executor with {} threads", threads);
+    final ExecutorService executor = Executors.newFixedThreadPool(threads);
+    try {
+      return executor.submit(new SizeOfFileCallable(file, executor)).get();
+    } catch (final Exception e) {
+      throw new RuntimeException("Failed to calculate the dir size", e);
+    } finally {
+      executor.shutdown();
+    }
+  }
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(DirSize.class);
+
+  private DirSize() {}
+
+}
+</pre>
+<p>The idea is very much the same as before. The inner class <code>SizeOfFileCallable</code> extends <code>Callable&lt;Long&gt;</code> and delegates the computation of its subtasks to the instance of <code>ExecutorService</code> passed to its constructor. This is not required when dealing with the <code>RecursiveTask</code>, was the latter automatically adds its subclasses to the thread’s queue for execution.</p>
+<p>We will not go through this in more detail to keep this article focused on the Fork/Join Framework. As mentioned already, this method blocks once all threads are occupied as shown next.</p>
+<pre>17:22:39.216 [main] DEBUG DirSize.java:78 - Creating executor with 4 threads
+17:22:39.222 [pool-1-thread-1] DEBUG DirSize.java:56 - Computing size of: C:\Test\
+17:22:39.223 [pool-1-thread-2] DEBUG DirSize.java:56 - Computing size of: C:\Test\Dir 1
+17:22:39.223 [pool-1-thread-4] DEBUG DirSize.java:56 - Computing size of: C:\Test\Dir 2
+17:22:39.223 [pool-1-thread-3] DEBUG DirSize.java:56 - Computing size of: C:\Test\Dir 3
+</pre>
+<p>This example is executed on a Core i5 computer, which has four available processors (as indicated by <code>Runtime.getRuntime().availableProcessors()</code> <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Runtime.html#availableProcessors()" target="_blank">Java Doc</a>). Once all four threads are occupied, this approach will block forever as we saw in the bank branch example in the beginning of this article. All threads are occupied and thus cannot be used to solve the other tasks. One can suggest using more threads. While that may seem to be a solution, the Fork/Join Framework solved the same problem using only four threads. Furthermore, threads are not cheap and one should not simply spawn thousands of threads just because he or she chooses an inappropriate technique.</p>
+<p>While the phrase multithreading is overused in the programming community, the choice of multithreading technique is important as some options simply do not work in certain scenarios as we saw above.</p>
+<h3>RecursiveAction</h3>
+<p>The Fork/Join Framework supports two types of tasks. The second type of task is the <code>RecursiveAction</code>. These types of tasks are not meant to return anything. These are ideal for cases where you want to do an action, such as delete a file, without returning anything. In general you cannot delete an empty directory. First you need to delete all its files first. In this case the <code>RecursiveAction</code> can be used where each action either deletes the file, or first deletes all directory content and then deletes the directory itself.</p>
+<p>Following is the final example we have in this article. It shows the modified version of the <code>DirSize</code>, which makes use of the <code>SizeOfFileAction</code> inner class to compute the size of the directory.</p>
+<pre>package com.javacreed.examples.concurrency.part4;
+
+import java.io.File;
+import java.util.Objects;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.RecursiveAction;
+import java.util.concurrent.atomic.AtomicLong;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class DirSize {
+
+  private static class SizeOfFileAction extends RecursiveAction {
+
+    private static final long serialVersionUID = -196522408291343951L;
+
+    private final File file;
+    private final AtomicLong sizeAccumulator;
+
+    public SizeOfFileAction(final File file, final AtomicLong sizeAccumulator) {
+      this.file = Objects.requireNonNull(file);
+      this.sizeAccumulator = Objects.requireNonNull(sizeAccumulator);
+    }
+
+    @Override
+    protected void compute() {
+      DirSize.LOGGER.debug("Computing size of: {}", file);
+
+      if (file.isFile()) {
+        sizeAccumulator.addAndGet(file.length());
+      } else {
+        final File[] children = file.listFiles();
+        if (children != null) {
+          for (final File child : children) {
+            ForkJoinTask.invokeAll(new SizeOfFileAction(child, sizeAccumulator));
+          }
+        }
+      }
+    }
+  }
+
+  public static long sizeOf(final File file) {
+    final ForkJoinPool pool = new ForkJoinPool();
+    try {
+      final AtomicLong sizeAccumulator = new AtomicLong();
+      pool.invoke(new SizeOfFileAction(file, sizeAccumulator));
+      return sizeAccumulator.get();
+    } finally {
+      pool.shutdown();
+    }
+  }
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(DirSize.class);
+
+  private DirSize() {}
+
+}
+</pre>
+<p>This class is very similar to its predecessors. The main difference lies in the way the final value (the size of the file or directory) is returned. Remember that the <code>RecursiveAction</code> cannot return a value. Instead, all tasks will share a common counter of type <code>AtomicLong</code> and these will increment this common counter instead of returning the size of the file.</p>
+<p>Let us break this class into smaller parts and go through each part individually. We will skip the parts that were already explained before so not to repeat ourselves.</p>
+<ol>
+<li>
+The method <code>sizeOf()</code> makes use of the <code>ForkJoinPool</code> as before. The common counter, named <code>sizeAccumulator</code>, is initialised in this method too and passed to the first task. This instance will be shared with all subtasks and all will increment this value.<p></p>
+<pre>  public static long sizeOf(final File file) {
+    final ForkJoinPool pool = new ForkJoinPool();
+    try {
+      final AtomicLong sizeAccumulator = new AtomicLong();
+      pool.invoke(new SizeOfFileAction(file, sizeAccumulator));
+      return sizeAccumulator.get();
+    } finally {
+      pool.shutdown();
+    }
+  }
+</pre>
+<p>Like before, this method will block until all subtasks are ready, after which returns the total size.
+</p></li>
+<li>
+The inner class <code>SizeOfFileAction</code> extends <code>RecursiveAction</code> and its constructor takes two arguments. <p></p>
+<pre>  private static class SizeOfFileAction extends RecursiveAction {
+
+    private static final long serialVersionUID = -196522408291343951L;
+
+    private final File file;
+    private final AtomicLong sizeAccumulator;
+
+    public SizeOfFileAction(final File file, final AtomicLong sizeAccumulator) {
+      this.file = Objects.requireNonNull(file);
+      this.sizeAccumulator = Objects.requireNonNull(sizeAccumulator);
+    }
+
+    @Override
+    protected void compute() {
+      <span class="comments">// Removed for brevity</span>
+    }
+  }
+</pre>
+<p>The first argument is the file (or directory) which size will be computed. The second argument is the shared counter.
+</p></li>
+<li>
+The compute method is slightly simpler here as it does not have to wait for the subtasks. If the given file is a file, then it increments the common counter (referred to as <code>sizeAccumulator</code>). Otherwise, if this file is a directory, it forks the new instances of <code>SizeOfFileAction</code> for each child file.<p></p>
+<pre>    protected void compute() {
+      DirSize.LOGGER.debug("Computing size of: {}", file);
+
+      if (file.isFile()) {
+        sizeAccumulator.addAndGet(file.length());
+      } else {
+        final File[] children = file.listFiles();
+        if (children != null) {
+          for (final File child : children) {
+            ForkJoinTask.invokeAll(new SizeOfFileAction(child, sizeAccumulator));
+          }
+        }
+      }
+    }
+</pre>
+<p>In this case the method <code>invokeAll()</code> (<a href="https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ForkJoinTask.html#invokeAll(java.util.concurrent.ForkJoinTask...)" target="_blank">Java Doc</a>) is used to fork the tasks.
+</p></li>
+</ol>
+<p>This approach takes approximately 11 seconds to complete making it the slowest of all three as shown next.</p>
+<pre>19:04:39.925 [main] INFO Example5.java:40 - Size of 'C:\Test': 113463195117 bytes (in 11445506093 nano)
+19:04:51.433 [main] INFO Example5.java:40 - Size of 'C:\Test': 113463195117 bytes (in 11504270600 nano)
+19:05:02.876 [main] INFO Example5.java:40 - Size of 'C:\Test': 113463195117 bytes (in 11442215513 nano)
+19:05:15.661 [main] INFO Example5.java:40 - Size of 'C:\Test': 113463195117 bytes (in 12784006599 nano)
+19:05:27.089 [main] INFO Example5.java:40 - Size of 'C:\Test': 113463195117 bytes (in 11428115064 nano)
+19:05:27.226 [main] INFO Example5.java:44 - Average: 11720822773 nano (11 seconds)
+</pre>
+<p>This may be a surprise to many. How is this possible, when multiple threads were used? This is a common misconception. Multithreading does not guarantee better performance. In this case we have a design flaw which ideally we avoid. The common counter named <code>sizeAccumulator</code> is shared between all threads and thus causes contention between threads. This actually defeats the purpose of the divide and conquer technique as a bottleneck is created.</p>
+<h2>Conclusion</h2>
+<p>This article provided a detailed explanation of the Fork/Join Framework and how this can be used. It provided a practical example and compared several approaches. The Fork/Join Framework is ideal for recursive algorithms but it does not distribute the load amongst the threads evenly. The tasks and subtask should not block on anything else but join and should delegate work using fork. Avoid any blocking IO operations within tasks and minimise the mutable share state especially modifying the variable as much as possible as this has a negative effect on the overall performance.</p>
+<div class="crp_related "><h2>Related Posts</h2><ul><li><a href="http://www.javacreed.com/take-a-screenshot-of-web-page/" class="crp_title">Take a Screenshot of Web Page</a></li><li><a href="http://www.javacreed.com/how-to-cache-results-to-boost-performance/" class="crp_title">How to cache results to boost performance</a></li><li><a href="http://www.javacreed.com/what-is-deadlock-and-how-to-prevent-it/" class="crp_title">What is Deadlock and How to Prevent It?</a></li><li><a href="http://www.javacreed.com/how-to-add-custom-file-attributes/" class="crp_title">How to Add Custom File Attributes</a></li><li><a href="http://www.javacreed.com/how-to-read-utf8-strings-with-randomaccessfile/" class="crp_title">How to Read UTF8 Strings with RandomAccessFile</a></li></ul><div class="crp_clear"></div></div> </div>
+ 
+<div class="item-author clearfix">
+<div class="panel-outer"><img src="./Java Fork Join Example _ Java Creed_files/Avatar.png" width="66" height="70" alt="Albert Attard" class="avatar avatar-70 wp-user-avatar wp-user-avatar-70 alignnone photo"><h3><a href="http://www.javacreed.com/author/albert/" title="Posts by Albert Attard" rel="author">Albert Attard</a></h3>
+<p>Albert Attard is a Java passionate and technical lead at a research group. You can find him on <a rel="author" href="https://plus.google.com/+AlbertAttard">Google+</a>. Over the past years Albert worked on various Java projects including traditional server/client applications, modular applications, large data handling applications and concurrent data manipulation applications to name a few. He has a BSc degree from the University of London (<a href="http://www.lon.ac.uk/">Homepage</a>) and an MSc Information Security with the same university. His MSc thesis (<a href="http://www.amazon.com/Novel-Card-Present-Payment-Scheme-Technology/dp/3659114529">Book</a>) received the 2012 SearchSecurity.co.UK award (<a href="http://www.computerweekly.com/feature/Royal-Holloway-2012-Designing-a-secure-contactless-payment-system">Website</a>). </p>
+<ul class="author-meta clearfix"><li><span class="author-meta-title">Published:</span> 69 posts</li><li><span class="author-meta-title">Web:</span> <a href="http://www.javacreed.com/" target="_blank">http://www.javacreed.com</a></li> </ul>
+</div>
+<ul class="social"> <li class="aim">
+<a href="http://www.javacreed.com/java-fork-join-example/albertattard" target="_blank"><img src="./Java Fork Join Example _ Java Creed_files/logo-google.png" alt=""></a>
+</li> </ul>
+</div> <div id="comments" class=" comment-box border">   <h4 class="comment-box-title">
+5 Responses to “Java Fork Join Example” </h4><hr>
+<div class="comment-list">
+<div class="comment-block">
+<div class="comment">
+<div class="comment-author">
+<img src="./Java Fork Join Example _ Java Creed_files/wpua-32x32.png" width="28" height="28" alt="" class="avatar avatar-28wp-user-avatar wp-user-avatar-28 alignnone photo avatar-default"> <span class="comment-author-link"><span class="author-link-span">
+Amit</span>
+</span>
+<div class="comment-meta">
+<span class="comment-date">August 6, 2015</span>
+<span class="comment-replay-link"><a rel="nofollow" class="comment-reply-link btn btn-mini" href="http://www.javacreed.com/java-fork-join-example/?replytocom=1633#respond" onclick="return addComment.moveForm( &quot;comment-1633&quot;, &quot;1633&quot;, &quot;respond&quot;, &quot;5257&quot; )" aria-label="Reply to Amit">Reply</a></span>
+</div>
+<div class="clearfix"></div>
+</div>
+<div class="comment-body">
+<p>Awesome post.. I congratulate u Albert. Gave me such deep clarity in such a simple way.. nowhere else I found it.</p>
+<p>Keep doing good work. Cheers !!!</p>
+</div>
+</div><div class="comment-block">
+<div class="comment">
+<div class="comment-author">
+<img src="./Java Fork Join Example _ Java Creed_files/Avatar.png" width="28" height="28" alt="Albert Attard" class="avatar avatar-28 wp-user-avatar wp-user-avatar-28 alignnone photo"> <span class="comment-author-link"><span class="author-link-span">
+<a href="http://www.javacreed.com/" rel="external nofollow" class="url">Albert Attard</a></span>
+</span>
+<div class="comment-meta">
+<span class="comment-date">August 6, 2015</span>
+<span class="comment-replay-link"><a rel="nofollow" class="comment-reply-link btn btn-mini" href="http://www.javacreed.com/java-fork-join-example/?replytocom=1634#respond" onclick="return addComment.moveForm( &quot;comment-1634&quot;, &quot;1634&quot;, &quot;respond&quot;, &quot;5257&quot; )" aria-label="Reply to Albert Attard">Reply</a></span>
+</div>
+<div class="clearfix"></div>
+</div>
+<div class="comment-body">
+<p>I am glad you liked it</p>
+</div>
+</div></div> 
+</div> 
+<div class="comment-block">
+<div class="comment">
+<div class="comment-author">
+<img src="./Java Fork Join Example _ Java Creed_files/wpua-32x32.png" width="28" height="28" alt="" class="avatar avatar-28wp-user-avatar wp-user-avatar-28 alignnone photo avatar-default"> <span class="comment-author-link"><span class="author-link-span">
+Rahul Rao</span>
+</span>
+<div class="comment-meta">
+<span class="comment-date">December 2, 2015</span>
+<span class="comment-replay-link"><a rel="nofollow" class="comment-reply-link btn btn-mini" href="http://www.javacreed.com/java-fork-join-example/?replytocom=2999#respond" onclick="return addComment.moveForm( &quot;comment-2999&quot;, &quot;2999&quot;, &quot;respond&quot;, &quot;5257&quot; )" aria-label="Reply to Rahul Rao">Reply</a></span>
+</div>
+<div class="clearfix"></div>
+</div>
+<div class="comment-body">
+<p>Awesome post about ForkJoin frame work.<br>
+Keep doing work.</p>
+</div>
+</div></div> 
+<div class="comment-block">
+<div class="comment">
+<div class="comment-author">
+<img src="./Java Fork Join Example _ Java Creed_files/wpua-32x32.png" width="28" height="28" alt="" class="avatar avatar-28wp-user-avatar wp-user-avatar-28 alignnone photo avatar-default"> <span class="comment-author-link"><span class="author-link-span">
+Prashant</span>
+</span>
+<div class="comment-meta">
+<span class="comment-date">December 17, 2015</span>
+<span class="comment-replay-link"><a rel="nofollow" class="comment-reply-link btn btn-mini" href="http://www.javacreed.com/java-fork-join-example/?replytocom=3064#respond" onclick="return addComment.moveForm( &quot;comment-3064&quot;, &quot;3064&quot;, &quot;respond&quot;, &quot;5257&quot; )" aria-label="Reply to Prashant">Reply</a></span>
+</div>
+<div class="clearfix"></div>
+</div>
+<div class="comment-body">
+<p>One of the best article to get the idea about fork/join practical use.<br>
+thanks alot to post such a nice stuff.<br>
+Good Work…….. appriciated…!!!</p>
+</div>
+</div></div> 
+<div class="comment-block">
+<div class="comment">
+<div class="comment-author">
+<img src="./Java Fork Join Example _ Java Creed_files/wpua-32x32.png" width="28" height="28" alt="" class="avatar avatar-28wp-user-avatar wp-user-avatar-28 alignnone photo avatar-default"> <span class="comment-author-link"><span class="author-link-span">
+Alexander</span>
+</span>
+<div class="comment-meta">
+<span class="comment-date">April 20, 2016</span>
+<span class="comment-replay-link"><a rel="nofollow" class="comment-reply-link btn btn-mini" href="http://www.javacreed.com/java-fork-join-example/?replytocom=3167#respond" onclick="return addComment.moveForm( &quot;comment-3167&quot;, &quot;3167&quot;, &quot;respond&quot;, &quot;5257&quot; )" aria-label="Reply to Alexander">Reply</a></span>
+</div>
+<div class="clearfix"></div>
+</div>
+<div class="comment-body">
+<p>Albert, if you look closer, your Task-based implementation is only 2.16 times faster (not 4) than single-threaded approach.</p>
+<p>Don’t blame AtomicLong, just fix the code, replace<br>
+for (final File child : children) {<br>
+ForkJoinTask.invokeAll(new SizeOfFileAction(child, sizeAccumulator));<br>
+}</p>
+<p>by</p>
+<p> List actions = new ArrayList();<br>
+for (final File child : children) {<br>
+actions.add(new SizeOfFileAction(child, sizeAccumulator));<br>
+}<br>
+ForkJoinTask.invokeAll(actions);</p>
+<p>this replacement made my “Windows” folder size computation 3.19 times faster (quad core i5).</p>
+</div>
+</div></div> 
+</div> 
+<div class="navigation">
+<div class="left"></div>
+<div class="right"></div>
+</div> <div id="respond" class="comment-respond">
+<h3 id="reply-title" class="comment-reply-title"></h3><h4 id="reply-title">Leave a Comment</h4><hr> <small><a rel="nofollow" id="cancel-comment-reply-link" href="http://www.javacreed.com/java-fork-join-example/#respond" style="display:none;">Click here to cancel reply.</a></small> <form action="http://www.javacreed.com/wp-comments-post.php" method="post" id="commentform" class="comment-form" novalidate="novalidate">
+<div class="control-group overlabel-wrapper"><textarea name="comment" id="comment" class="input-xlarge span5 required" rows="8" tabindex="4"></textarea><label for="comment" class="overlabel overlabel-apply">Comment (*)</label></div><div class="control-group overlabel-wrapper"><input type="text" name="author" id="author" class="span3 required" value="" tabindex="1"><label for="author" class="overlabel overlabel-apply">Name (*)</label></div>
+<div class="control-group overlabel-wrapper"><input type="text" name="email" id="email" class="required email span3" value="" tabindex="2"><label for="email" class="overlabel overlabel-apply">Email (*)</label>
+</div>
+<div class="control-group overlabel-wrapper"><input type="text" name="url" id="url" class="span3" value="" tabindex="3"><label for="url" class="overlabel overlabel-apply">Website</label></div>
+<p class="cptch_block"><br><span class="cptch_wrap">
+<label class="cptch_label" for="cptch_input">
+<span class="cptch_span"><img class="cptch_img " src="data: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAMAAADDpiTIAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAABhQTFRFlJSUU1NT////AAAAubm52traKCgo8fHx0DOHgQAACeFJREFUeNrs3euWo6gCgFGwAd//jU9Vz5mZ6txAxVmC+/vdy6TjFvBSSVh064KPAAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAAMBHAIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAXABB+9Sz+3HT81bc3n9V6+L+QATgFQOkNYD3pvwCAEQAAIwAARgAAjAAAGAEAMAIAYAS4zZXAnEI4vKtKjCGlnP84Rtffmy49th2+tp3fDABfr5PT9yttfqlSfm95vf2l4PWbQdyp4GvPV46gNe1kUOrbfqSQWl/pa9PrFT77K90L+NpRZevO/9o/a9MHmbdv+2vD646dlOuSQ3Iv4M1QsLbvp5j675l/N37k8Mwf/w8lrBf6yC94NzA3LapK6r5nfnT0CC2bl5IA/BgHGtbVZedRlI6s9zdIO2VkuQuAhkO15LO2/NcAcHg3xX7D1i0BLGs57RCN/8EI8HoMK3kBoPkjPGMCaBUQlzNGgHjFz/m6j4TF83ZQXcAZU8Al9/+FAeTzrp2u5ew54MX4VRYAuu2ltf/+6bu3QudZ644APgzUxw+mdPKFgHipGz7TAegwm4ZTh4DU/crSHQGEXydeTVnjmauAePHLf8MD+C8uNfUcAOICwNUAVJcBod8AUBYArgegejVg7UWrZACuCKB2NWD3q5RRFoA3B1CdBHKf933tv7+9M4DaueC+l8njLABvD6D24PiusTuOcQUQgFdHa4fLt2mQK4AAtEwC2z+dx5VlWgC4MoDauWA+uL24AHBtALnvOjCPtv9vD6B2Lrjt83mYAEoG4PIAKpPApnXg45OAaQHg+gAqFwTj/tFkiG9gA2BNvS4GPFCKCwAjAKhOAju3c/UrQAC0TgKtH1EabwEAQNOZQN7DaJSvYAXg80u1TwJxwAUAAP0mgTTiAgCAv8tHHw56eMQwLwAMBaAyCdRfMA65AADg30kgHroYEMZcAADQOglU5vQ8zEPAAJwxCTwMHxmAEQFULgjm5neaFgCGBFD5bq/WM8C4ADAmgMoFwdB2EaEsAIwKYOckMPACAIBPx3LjJJAGXgAAcHwSWEdeAACw7Vww1yaAsgAwNoDPk0CsvckMwOAAKhcEw+d/nhYARgewbRL4c8CICwDjA1i2TAKjLwAAqC7rP04CafQFAACHJoE86jMAAHwuNk4C4y8AADgyCYQxHwIEoF5qmQRmWAAAsGcSKC+GibAAMBOAzxcEw5ORuAAwFYDKJJBmWQAAsHcSSMNfAgag0ucLgmWOBQAA78vtPzK6ADAhgObftS8ZgCkBLI0/M5sWAOYE0DYJhBWASQE0TQJl8P0PwO5zwU6/MAnAhQGssy8AAKiUpj4DBODoJFAWACYH0HBXCICZAdTvCgEwN4CWRwMAmBnAUuZeBQJQK889CQBQXQeGqa8EAXDzSQCAo5NAAGB2ADu+NQCAqQAsZd5zQQAOjwCeCZwdQO2W0NCTAAD188Ay81MhAFRreCzEXwZNDKDp6eAEwKwA2h4NHXcSAODIGeAEkwAAhxcAY58LAnDsDHD4PxAC4OMZ4MNOnnASAKB9Aggz3hUC4MPx//BbYOs64V0hAFoXAL8n+fnuCgHwfgAoz9d65psEAGhdAKyVN+Xr4icDEF4P72WyC4IAtC0A/tmzebJvCwCgfQFQe1t+NGoiAPH9gR2nmgQAaFkA/LFX81R3hQCoLwAeF/dTTQIAbFoAzHcmAEB1AfD8ajNNAgA8H/+hekSHeS4IArBxAfBqjhj50QAAnsb30nA4zzMJAFBZAKwt/2rgSQCAjwuA97d3yiR3hQD4uABIrf/w8R2uAAwJ4GEBEJunimEnAQA+7NWy4WrRqJMAAHsWAA2TQAFgPABp2839OMOjAQD8GAA2HsPrDN8aAMDbM7v1wDsc564QAO8WAGE7mREvCALwZgHQ9Bp5/G8NAOD1vmwbv9fxJwEAXo/mjQfvOvwkAMDLU7rmV0ijTwIAvNqPZbec4R4NAODVYm7Dbht9EgDgxU7cdBFv8K8RBeB5GN+4eB97EgDgeSG3cZflob8/DICnHRj6vdEBJgEAHq8AlMNbGOquEADx+O6qTAIFgAsDSD0G7DjuJHB3ALnL0bqOOwncHUDps6vCsJPAvQE83c3b/XEMOwncG0DqdqTWvlU+AXBBALn0m6vjoD8ocGsAseNAXVsHRgCuBuBpAXDoKF3DmJPAjQGkvruoNgRc9K7QfQE8LQDiae/3ypPAfQGU7j8EX/t5oUv+rdBtAcT+p+rV35dJAFwGQDjjYl31F8YyAF0AlBMO1h5HZ3UIuODVgCEB/Oq/p7pcrR/xV4YvDCCeNpTmctL0XP+Z2QhADwDH1tMv9n+n23Vrw0+MrgA0dtbt1Xzi3brxfmn8ugDSSbdX05knaC2/NBoB6HAw7R5Iw6ln6A1zwMUEhCEHgN3L6RzPfWCjCcCl1gFXBZBrZ1S77q2ks5/Zavyx6QvdGAqD7v89pwI5nv3MVsvb/ktAAuDTQBraPsWw5UBa4+nX6UPr/r/QU4Jh2N3/fwOpbRxI1RO0ePTq0pbdf51B4FoA1hTito/x+5OMIa+VjfbV9PQKecfbPvB6cwHIOaUQYoxlx2f4U0FI+Y+D+Hu727da4veWvja1Vvf63+/82Pv+ernvd57XmwIIv3oWO2449Vjvb6AAAAAAAADAdQCsABgBADACAGAEAMAIAIARAADNFwAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAAEAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgAAQAAJAAAgAASAABIAAEAACQAAIAAEgAASAABAAAkAACAABIAAEgADQc/8TYACNZkCmvyLwcAAAAABJRU5ErkJggg=="></span>
+<span class="cptch_span">&nbsp;−&nbsp;</span>
+<span class="cptch_span"><input id="cptch_input" class="cptch_input" type="text" autocomplete="off" name="cptch_number" value="" maxlength="2" size="2" aria-required="true" required="required" style="margin-bottom:0;display:inline;font-size: 12px;width: 40px;"></span>
+<span class="cptch_span">&nbsp;=&nbsp;</span>
+<span class="cptch_span">8</span>
+<input type="hidden" name="cptch_result" value="yyI=">
+<input type="hidden" name="cptch_time" value="1469966410">
+<input type="hidden" value="Version: 4.1.6">
+</label><span class="cptch_reload_button_wrap hide-if-no-js">
+<noscript>
+&lt;style type="text/css"&gt;.hide-if-no-js{display:none!important;}&lt;/style&gt;
+</noscript>
+<span class="cptch_reload_button dashicons dashicons-update"></span>
+</span></span></p><p class="form-submit"><input name="submit" type="submit" id="submit" class="submit btn" value="Submit Comment"> <input type="hidden" name="comment_post_ID" value="5257" id="comment_post_ID">
+<input type="hidden" name="comment_parent" id="comment_parent" value="0">
+</p> </form>
+</div> 
+</div> </section> </div>
+</div>
+<div class="span3">
+<div class="widgets-container">
+<div class="masonry-widgets isotope" style="position: relative; overflow: hidden; height: 3213px;"><aside id="text-2" class="widget widget_text isotope-item" style="position: absolute; left: 0px; top: 0px; transform: translate3d(0px, 0px, 0px);"><h3 class="widget-title">Examples GIT Repository</h3> <div class="textwidget"><p>Please note that we are moving to GIT <a href="https://github.com/javacreed" target="_blank"><br>
+https://github.com/javacreed<br>
+</a></p>
+</div>
+</aside><aside id="text-3" class="widget widget_text isotope-item" style="position: absolute; left: 0px; top: 0px; transform: translate3d(0px, 116px, 0px);"><h3 class="widget-title">Advertisement </h3> <div class="textwidget"><script async="" src="./Java Fork Join Example _ Java Creed_files/adsbygoogle.js"></script>
+ 
+<ins class="adsbygoogle" style="display:inline-block;width:200px;height:200px" data-ad-client="ca-pub-5674469676151789" data-ad-slot="3906729828" data-adsbygoogle-status="done"><ins id="aswift_0_expand" style="display:inline-table;border:none;height:200px;margin:0;padding:0;position:relative;visibility:visible;width:200px;background-color:transparent"><ins id="aswift_0_anchor" style="display:block;border:none;height:200px;margin:0;padding:0;position:relative;visibility:visible;width:200px;background-color:transparent"><iframe width="200" height="200" frameborder="0" marginwidth="0" marginheight="0" vspace="0" hspace="0" allowtransparency="true" scrolling="no" allowfullscreen="true" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){setTimeout(h,0)}else if(h.match){try{h=s.upd(h,i)}catch(e){}w.location.replace(h)}}" id="aswift_0" name="aswift_0" style="left:0;position:absolute;top:0;" src="./Java Fork Join Example _ Java Creed_files/saved_resource.html"></iframe></ins></ins></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script></div>
+</aside><aside id="text-4" class="widget widget_text isotope-item" style="position: absolute; left: 0px; top: 0px; transform: translate3d(0px, 388px, 0px);"><h3 class="widget-title">Donations</h3> <div class="textwidget"><div align="center">
+<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+<input type="hidden" name="cmd" value="_s-xclick">
+<input type="hidden" name="hosted_button_id" value="9SC3235C47YCG">
+<input type="image" src="./Java Fork Join Example _ Java Creed_files/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+<img alt="" border="0" src="./Java Fork Join Example _ Java Creed_files/pixel.gif" width="1" height="1">
+</form>
+</div></div>
+</aside><aside id="ttrecentpostwidget-3" class="widget TTRecentPostWidget isotope-item" style="position: absolute; left: 0px; top: 0px; transform: translate3d(0px, 521px, 0px);"><h3 class="widget-title">Articles</h3><ul class="themetonrecentposts"><li class="recent-news-item"><img style="width:52px; height:52px" src="./Java Fork Join Example _ Java Creed_files/Software-Transactional-Memory-Example-using-Multiverse-150x150-52x52.png" alt="Software Transactional Memory Example using Multiverse"><h6><a href="http://www.javacreed.com/software-transactional-memory-example-using-multiverse/">Software Transactional Memory Example using Multiverse</a></h6><p class="tab-meta">no comments </p><div class="clearfix"></div></li><li class="recent-news-item"><img style="width:52px; height:52px" src="./Java Fork Join Example _ Java Creed_files/Compress-Large-Text-Data-in-Table-150x150-52x52.png" alt="Compress Large Text Data in Table"><h6><a href="http://www.javacreed.com/5362-2/">Compress Large Text Data in Table</a></h6><p class="tab-meta">no comments </p><div class="clearfix"></div></li><li class="recent-news-item"><img style="width:52px; height:52px" src="./Java Fork Join Example _ Java Creed_files/How-to-Retrieve-the-Video-Properties-150x150-52x52.png" alt="How to Retrieve the Video Properties"><h6><a href="http://www.javacreed.com/how-to-retrieve-the-video-properties/">How to Retrieve the Video Properties</a></h6><p class="tab-meta">4 comments </p><div class="clearfix"></div></li><li class="recent-news-item"><img style="width:52px; height:52px" src="./Java Fork Join Example _ Java Creed_files/How-to-Modify-a-String-Without-Creating-a-New-One-150x150-52x52.png" alt="How to Modify a String Without Creating a New One"><h6><a href="http://www.javacreed.com/how-to-modify-a-string-without-creating-a-new-one/">How to Modify a String Without Creating a New One</a></h6><p class="tab-meta">no comments </p><div class="clearfix"></div></li><li class="recent-news-item"><img style="width:52px; height:52px" src="./Java Fork Join Example _ Java Creed_files/Using-Flyway-with-Virgo-150x150-52x52.png" alt="Using Flyway with Virgo"><h6><a href="http://www.javacreed.com/using-flyway-with-virgo/">Using Flyway with Virgo</a></h6><p class="tab-meta">no comments </p><div class="clearfix"></div></li></ul></aside><aside id="ttrecentpostwidget-4" class="widget TTRecentPostWidget isotope-item" style="position: absolute; left: 0px; top: 0px; transform: translate3d(0px, 1009px, 0px);"><h3 class="widget-title">How To</h3><ul class="themetonrecentposts"><li class="recent-news-item"><img style="width:52px; height:52px" src="http://www.javacreed.com/java-fork-join-example/" alt="How to Lock a File"><h6><a href="http://www.javacreed.com/how-to-lock-a-file/">How to Lock a File</a></h6><p class="tab-meta">no comments </p><div class="clearfix"></div></li><li class="recent-news-item"><img style="width:52px; height:52px" src="http://www.javacreed.com/java-fork-join-example/" alt="How to Add Custom File Attributes"><h6><a href="http://www.javacreed.com/how-to-add-custom-file-attributes/">How to Add Custom File Attributes</a></h6><p class="tab-meta">no comments </p><div class="clearfix"></div></li><li class="recent-news-item"><img style="width:52px; height:52px" src="http://www.javacreed.com/java-fork-join-example/" alt="Take a Screenshot of Web Page"><h6><a href="http://www.javacreed.com/take-a-screenshot-of-web-page/">Take a Screenshot of Web Page</a></h6><p class="tab-meta">no comments </p><div class="clearfix"></div></li><li class="recent-news-item"><img style="width:52px; height:52px" src="http://www.javacreed.com/java-fork-join-example/" alt="How to Compute Hash Code of Streams"><h6><a href="http://www.javacreed.com/how-to-compute-hash-code-of-streams/">How to Compute Hash Code of Streams</a></h6><p class="tab-meta">no comments </p><div class="clearfix"></div></li><li class="recent-news-item"><img style="width:52px; height:52px" src="http://www.javacreed.com/java-fork-join-example/" alt="How to Write InputStream to RandomAccessFile"><h6><a href="http://www.javacreed.com/how-to-write-inputstream-to-randomaccessfile/">How to Write InputStream to RandomAccessFile</a></h6><p class="tab-meta">no comments </p><div class="clearfix"></div></li></ul></aside><aside id="text-5" class="widget widget_text isotope-item" style="position: absolute; left: 0px; top: 0px; transform: translate3d(0px, 1461px, 0px);"><h3 class="widget-title">Advertisement</h3> <div class="textwidget"><script async="" src="./Java Fork Join Example _ Java Creed_files/adsbygoogle.js"></script>
+ 
+<ins class="adsbygoogle" style="display:inline-block;width:120px;height:600px" data-ad-client="ca-pub-5674469676151789" data-ad-slot="9689774623" data-adsbygoogle-status="done"><ins id="aswift_1_expand" style="display:inline-table;border:none;height:600px;margin:0;padding:0;position:relative;visibility:visible;width:120px;background-color:transparent"><ins id="aswift_1_anchor" style="display:block;border:none;height:600px;margin:0;padding:0;position:relative;visibility:visible;width:120px;background-color:transparent"><iframe width="120" height="600" frameborder="0" marginwidth="0" marginheight="0" vspace="0" hspace="0" allowtransparency="true" scrolling="no" allowfullscreen="true" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){setTimeout(h,0)}else if(h.match){try{h=s.upd(h,i)}catch(e){}w.location.replace(h)}}" id="aswift_1" name="aswift_1" style="left:0;position:absolute;top:0;" src="./Java Fork Join Example _ Java Creed_files/saved_resource(3).html"></iframe></ins></ins></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script></div>
+</aside><aside id="categories-2" class="widget widget_categories isotope-item" style="position: absolute; left: 0px; top: 0px; transform: translate3d(0px, 2133px, 0px);"><h3 class="widget-title">Categories</h3> <ul>
+<li class="cat-item cat-item-3"><a href="http://www.javacreed.com/category/articles/">Articles</a>
+</li>
+<li class="cat-item cat-item-79"><a href="http://www.javacreed.com/category/awt/">AWT</a>
+</li>
+<li class="cat-item cat-item-50"><a href="http://www.javacreed.com/category/cache/">Cache</a>
+</li>
+<li class="cat-item cat-item-70"><a href="http://www.javacreed.com/category/collections-2/">Collections</a>
+</li>
+<li class="cat-item cat-item-46"><a href="http://www.javacreed.com/category/concurrency/">Concurrency</a>
+</li>
+<li class="cat-item cat-item-224"><a href="http://www.javacreed.com/category/crypto/">Crypto</a>
+</li>
+<li class="cat-item cat-item-71"><a href="http://www.javacreed.com/category/dependency-injection/">Dependency Injection</a>
+</li>
+<li class="cat-item cat-item-161"><a href="http://www.javacreed.com/category/design/">Design</a>
+</li>
+<li class="cat-item cat-item-156"><a href="http://www.javacreed.com/category/eclipse/">Eclipse</a>
+</li>
+<li class="cat-item cat-item-104"><a href="http://www.javacreed.com/category/error/">Error</a>
+</li>
+<li class="cat-item cat-item-4"><a href="http://www.javacreed.com/category/gson/">GSON</a>
+</li>
+<li class="cat-item cat-item-72"><a href="http://www.javacreed.com/category/guice/">Guice</a>
+</li>
+<li class="cat-item cat-item-78"><a href="http://www.javacreed.com/category/how-to/">How To</a>
+</li>
+<li class="cat-item cat-item-36"><a href="http://www.javacreed.com/category/intro/">Introduction</a>
+</li>
+<li class="cat-item cat-item-191"><a href="http://www.javacreed.com/category/io/">IO</a>
+</li>
+<li class="cat-item cat-item-184"><a href="http://www.javacreed.com/category/jdbc/">JDBC</a>
+</li>
+<li class="cat-item cat-item-123"><a href="http://www.javacreed.com/category/jvm/">JVM</a>
+</li>
+<li class="cat-item cat-item-221"><a href="http://www.javacreed.com/category/lang/">Lang</a>
+</li>
+<li class="cat-item cat-item-59"><a href="http://www.javacreed.com/category/maven/">Maven</a>
+</li>
+<li class="cat-item cat-item-228"><a href="http://www.javacreed.com/category/media/">Media</a>
+</li>
+<li class="cat-item cat-item-232"><a href="http://www.javacreed.com/category/miscellaneous/">Miscellaneous</a>
+</li>
+<li class="cat-item cat-item-253"><a href="http://www.javacreed.com/category/multiverse/">Multiverse</a>
+</li>
+<li class="cat-item cat-item-162"><a href="http://www.javacreed.com/category/object-oriented-programming/">Object Oriented Programming</a>
+</li>
+<li class="cat-item cat-item-108"><a href="http://www.javacreed.com/category/performance/">Performance</a>
+</li>
+<li class="cat-item cat-item-53"><a href="http://www.javacreed.com/category/process/">Process</a>
+</li>
+<li class="cat-item cat-item-49"><a href="http://www.javacreed.com/category/spring/">Spring</a>
+</li>
+<li class="cat-item cat-item-120"><a href="http://www.javacreed.com/category/sql/">SQL</a>
+</li>
+<li class="cat-item cat-item-45"><a href="http://www.javacreed.com/category/swing/">Swing</a>
+</li>
+<li class="cat-item cat-item-200"><a href="http://www.javacreed.com/category/testing/">Testing</a>
+</li>
+<li class="cat-item cat-item-37"><a href="http://www.javacreed.com/category/tips/">Tips</a>
+</li>
+<li class="cat-item cat-item-75"><a href="http://www.javacreed.com/category/tomcat/">Tomcat</a>
+</li>
+<li class="cat-item cat-item-177"><a href="http://www.javacreed.com/category/tutorial/">Tutorial</a>
+</li>
+<li class="cat-item cat-item-84"><a href="http://www.javacreed.com/category/utilities/">Utilities</a>
+</li>
+<li class="cat-item cat-item-218"><a href="http://www.javacreed.com/category/virgo/">Virgo</a>
+</li>
+<li class="cat-item cat-item-74"><a href="http://www.javacreed.com/category/web-application/">Web Application</a>
+</li>
+</ul>
+</aside> </div>
+</div> </div>
+</div> </div>
+</div></div>
+</section>
+   
+<footer id="footer">
+<div class="footer-sidebar-container">
+<div class="container"><div class="row">
+<div class="span12"><div id="text-6" class="widget widget_text"> <div class="textwidget"><a href="https://www.yourkit.com/java/profiler/" target="_blank" class="wpweb footer-image">
+<img src="./Java Fork Join Example _ Java Creed_files/Your-Kit.png" title="Your Kit">
+</a>
+<a href="https://www.jetbrains.com/idea/" target="_blank" class="wpweb footer-image">
+<img src="./Java Fork Join Example _ Java Creed_files/Intellij.png" title="Intellij">
+</a></div>
+</div></div> </div></div>
+</div>
+</footer>
+ 
+<div class="sub-footer">
+<div class="container"><div class="row">
+<div class="span12">
+<div class="copyright"><small>Copyright © 2012 javacreed.com. All Rights Reserved. <a href="https://www.web-design-malta.com/" target="_blank" title="Web Design Malta" style="text-decoration:none; ">Web Design in Malta / <img src="./Java Fork Join Example _ Java Creed_files/webee-black.png" border="0" alt="Web Design Malta" title="Web Design Malta" style="border-width: 0px; border-style: none; background:none;"></a>
+</small></div><small>
+<div class="footer-bottom-menu"><ul id="footer-menu" class=""><li id="menu-item-4495" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4495"><a href="http://www.javacreed.com/about-the-website/">About The Website</a></li>
+</ul></div>
+</small></div><small>
+</small></div></div><small>
+</small></div><small>
+</small></div><small>
+ 
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-37192864-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+ 
+ 
+<script type="text/javascript" src="./Java Fork Join Example _ Java Creed_files/wp-embed.min.js"></script>
+<script type="text/javascript" src="./Java Fork Join Example _ Java Creed_files/jquery.prettyPhoto.js"></script>
+<script type="text/javascript" src="./Java Fork Join Example _ Java Creed_files/bootstrap.min.js"></script>
+<script type="text/javascript" src="./Java Fork Join Example _ Java Creed_files/jquery.easing.1.3.js"></script>
+<script type="text/javascript" src="./Java Fork Join Example _ Java Creed_files/jquery.validate.min.js"></script>
+<script type="text/javascript" src="./Java Fork Join Example _ Java Creed_files/jquery.jplayer.min.js"></script>
+<script type="text/javascript" src="./Java Fork Join Example _ Java Creed_files/jquery.preloader.js"></script>
+<script type="text/javascript" src="./Java Fork Join Example _ Java Creed_files/jquery.flexslider-min.js"></script>
+<script type="text/javascript" src="./Java Fork Join Example _ Java Creed_files/jquery.isotope.min.js"></script>
+<script type="text/javascript" src="./Java Fork Join Example _ Java Creed_files/jquery.infinitescroll.min.js"></script>
+<script type="text/javascript" src="./Java Fork Join Example _ Java Creed_files/jquery.fitvids.js"></script>
+<script type="text/javascript" src="./Java Fork Join Example _ Java Creed_files/buttons.js"></script>
+<script type="text/javascript" src="./Java Fork Join Example _ Java Creed_files/scripts.js"></script>
+
+</small><iframe id="stSegmentFrame" name="stSegmentFrame" src="./Java Fork Join Example _ Java Creed_files/getSegment.html" frameborder="0" scrolling="no" width="0px" height="0px" style="display:none;"></iframe><div id="stwrapper" class="stwrapper" style="visibility: hidden; top: -999px; left: -999px;"><div class="stclose"></div><iframe allowtransparency="true" id="stLframe" class="stLframe" name="stLframe" frameborder="0" scrolling="no" width="353px" height="350px" src="./Java Fork Join Example _ Java Creed_files/index.8fd5b40d6e4511040cdaebf13b1f3b05.html" style="top: 0px; left: 0px;"></iframe></div><iframe name="oauth2relay265581463" id="oauth2relay265581463" src="./Java Fork Join Example _ Java Creed_files/postmessageRelay.html" tabindex="-1" style="width: 1px; height: 1px; position: absolute; top: -100px;"></iframe></body></html>

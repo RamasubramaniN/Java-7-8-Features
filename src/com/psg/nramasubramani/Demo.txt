@@ -1,0 +1,54 @@
+Default methods in interfaces
+----------------------------------
+
+interface Shape {
+	
+	void colorThis();
+
+	void calulateArea();
+}
+
+class Square implements Shape {
+	//duplicate implementation of colorThis. Need to fix the issue in all classes
+}
+
+class Rectangle implements Shape {
+
+}
+
+class Circle implements Shape {
+
+}
+
+
+abstract class Shape {
+
+	void colorIt() {
+		//Default implementation - fill the shape with red color 
+	}
+
+	abstract void calulateArea();
+}
+
+class Square implements Shape { //I cant extend any other class.
+
+}
+
+
+Lambda expressions
+-----------------------
+
+for(Employee employee : employeeList) {
+	if(employee.getDept.contains("dev") && employee.type.equals("permanent") && employee.salary > 10000){
+	{
+		list.add(employee);
+	}
+}
+process(list);
+
+for(Employee employee : employeeList) {
+	if(employee.name.startsWith("xyz") || employee.id < 1000) {
+		list.add(employee);
+	}
+}
+process(list);
