@@ -30,6 +30,10 @@ public class PredicateExample {
 		PlayerGroup playerGroup = new PlayerGroup();
 		List<Player> playerList = playerGroup.getPlayerList();
 		
+		//Simple Predicate. Following implements test(T t) method in Predicate Functional Interface.
+		//Functional interface can be implemented using Lambda directly.
+		//Predicate<Player> player1 = player -> player.equals(player);
+		
 		PlayerPredicate playerPredicate = new PlayerPredicate();
 		
 		List<Player> indianPlayerList = filterPlayers(playerList, playerPredicate.isIndianTeam());
