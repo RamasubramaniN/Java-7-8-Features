@@ -34,6 +34,23 @@ public class PredicateExample {
 		//Functional interface can be implemented using Lambda directly.
 		//Predicate<Player> player1 = player -> player.equals(player);
 		
+		/*
+		*
+		@FunctionalInterface
+		public interface Predicate<T> {
+		    boolean test(T t);
+		}
+		@FunctionalInterface
+		public interface Supplier<T> {
+		    T get();
+		}
+		@FunctionalInterface
+		public interface Consumer<T> {
+		    void accept(T t);
+		}
+		*
+		*/
+		
 		PlayerPredicate playerPredicate = new PlayerPredicate();
 		
 		List<Player> indianPlayerList = filterPlayers(playerList, playerPredicate.isIndianTeam());
