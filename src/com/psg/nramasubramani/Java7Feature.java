@@ -17,7 +17,20 @@ public class Java7Feature {
 		java7Feature.stringSwitchExample();
 		java7Feature.diamondOperator();
 		java7Feature.numericLiteral();
-		
+		System.out.println("Finally : " + java7Feature.finallyExample1());
+	}
+	
+	private int finallyExample1() {
+		int x = 10;
+		try {
+			x = 15;
+			return x;
+		} catch(Exception e) {
+			
+		} finally {
+			x = 20;
+		}
+		return x;
 	}
 
 	private void stringSwitchExample() {
