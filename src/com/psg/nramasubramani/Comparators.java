@@ -65,6 +65,8 @@ public class Comparators {
 	
 	private void afterJava8() {
 		
+		//Comparing takes Function as argument. Function is a functional interface and it has some default
+		//implementations and one abstract method `Apply`. Apply just execute the function.
 		System.out.println("----------- After Java 8 -----------");
 		List<Customer> customerCollection = getCustomerCollection();
 		
@@ -80,6 +82,9 @@ public class Comparators {
 		
 		//sort by age then sort by Name nulls first
 		customerCollection = getCustomerCollection();
+		//Comparing takes optional parameter as another comparator, 
+		//Comparator.nullsFirst returns a comparator, and takes another comparator as input.
+		//Comparator.naturalOrder() & String.CASE_INSENSITIVE_ORDER are again Comparators.
 		customerCollection.sort(Comparator.comparing(Customer::getAge)
 				.thenComparing(Customer::getName, Comparator.nullsFirst(Comparator.naturalOrder())));
 		printList(customerCollection, "Sort By Age then By name Nulls first");
