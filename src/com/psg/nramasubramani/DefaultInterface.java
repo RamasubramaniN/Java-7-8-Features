@@ -13,6 +13,10 @@ interface Printer {
 	//the default keyword. This feature is also known as Extension Methods.
 	//Generally we use Abstract class to provide default implementation but if you do it, you can extend only the abstract class
 	//Alternatively, If you use default interface, you can extend one more class.
+	
+	//This behavior results in diamond problem. When a class A, implements B & C interfaces 
+	//both have common method xyz(), Compiler does not know which implementation to pick and it throws compile time
+	//error 'Inherits Unrelated Defaults'.To solve this, class A has to override xyz() method.
 	void print();
 	
 	default void addBookMark(){
