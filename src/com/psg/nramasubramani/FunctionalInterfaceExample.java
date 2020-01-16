@@ -18,7 +18,8 @@ public class FunctionalInterfaceExample {
 
 	//functional interface is an interface with a single abstract method. 
 	//The Java API has many one-method interfaces such as Runnable, Callable, Comparator, ActionListener and others. 
-	//They can be implemented and instantiated using anonymous class syntax. 
+	//They can be implemented and instantiated using anonymous class syntax. They can be implemented by Lambda because
+	//Lambda expression will be assigned as implementation to the abstract method.
 	public static void main(String[] args) {
 		
 		Office office = new Office();
