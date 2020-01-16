@@ -19,6 +19,9 @@ public class ForkJoin {
 	 */
 	public static void main(String[] args) {
 		
+		//ForkJoin is mainly for recursive tasks when first task depends on second task completion.
+		//Second task waits for third & fourth tasks completion. 
+		//Executor & Callable cannot solve recursive problems.
 		File file = new File("/Users/rn5/.m2");
 		
 		//Single Thread : No concurrency.
